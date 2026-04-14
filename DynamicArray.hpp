@@ -15,8 +15,8 @@ public:
     DynamicArray(T *items, int count);
     DynamicArray(int size)
     {
-        if (size < 0) 
-        throw std::invalid_argument("Размер не может быть < 0");
+        if (size < 0)
+            throw std::invalid_argument("Размер не может быть < 0");
         this->size = size;
         capacity = size;
         data = new T[size];
@@ -26,7 +26,7 @@ public:
     {
         delete[] data;
     };
-    T Get(int index)
+    T Get(int index) const
     {
         if (index >= 0 && index < size)
             return data[index];
@@ -37,7 +37,7 @@ public:
     {
         return size;
     }
-    void Set(int index, T value)
+    void Set(int index, T value) const
     {
         if (index >= 0 && index < size)
             data[index] = value;
@@ -48,9 +48,13 @@ public:
 };
 
 template <typename T>
-DynamicArray<T>::DynamicArray(T *items, int count) : size(count), data(new T[size]), capacity(size)
+DynamicArray<T>::DynamicArray(T *items, int count)
 {
-    if (size < 0) throw std::invalid_argument("Размер не может быть < 0");
+    if (size < 0)
+        throw std::invalid_argument("Размер не может быть < 0");
+    size = count;
+    data = new T[size];
+    capacity = size;
     for (int i = 0; i < count; i++)
     {
         data[i] = items[i];
@@ -69,26 +73,18 @@ DynamicArray<T>::DynamicArray(const DynamicArray<T> &other) : size(other.size), 
 template <typename T>
 void DynamicArray<T>::Resize(int newSize)
 {
-    if (newSize < 0) {
+    if (newSize < 0)
+    {
         throw std::invalid_argument("Размер не может быть < 0");
     }
     T *newData = new T[newSize];
-    if (newSize > size)
+    int elementsToCopy = (newSize < size) ? newSize : size;
+    for (int i = 0; i < elementsToCopy; ++i)
     {
-        for (int i = 0; i < size; i++)
-        {
-            newData[i] = data[i];
-        }
+        newData[i] = data[i];
     }
-    else if (newSize < size)
-    {
-        for (int i = 0; i < newSize; i++)
-        {
-            newData[i] = data[i];
-        }
-    }
-    size = newSize;
     delete[] data;
-    capacity = newSize;
     data = newData;
+    size = newSize;
+    capacity = newSize;
 }

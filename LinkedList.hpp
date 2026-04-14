@@ -38,11 +38,11 @@ public:
     };
     Node<T> GetFirst()
     {
-        return head->data;
+        return head;
     };
     Node<T> GetLast()
     {
-        return tail->data;
+        return tail;
     };
     T Get(int index)
     {
@@ -58,23 +58,27 @@ public:
 
     LinkedList<T> *GetSubList(int startIndex, int endIndex)
     {
-        LinkedList<T>* newList = new LinkedList<T>();
-        if (startIndex < 0 || endIndex >= size || startIndex > endIndex) throw std::out_of_range ("Передаваемые параметры startIndex и/или endIndex - некорректны");
-        else if (startIndex == endIndex) {
+        LinkedList<T> *newList = new LinkedList<T>();
+        if (startIndex < 0 || endIndex >= size || startIndex > endIndex)
+            throw std::out_of_range("Передаваемые параметры startIndex и/или endIndex - некорректны");
+        else if (startIndex == endIndex)
+        {
             return newList;
         }
-        else {
-        int newSize = endIndex - startIndex;
-        Node<T>* tmp = head;
-        for (int i = 0; i < startIndex; i ++) 
-            tmp = tmp->next;
+        else
+        {
+            int newSize = endIndex - startIndex;
+            Node<T> *tmp = head;
+            for (int i = 0; i < startIndex; i++)
+                tmp = tmp->next;
 
-        for (int i = 0; i < newSize; i++) {
-            T newData = tmp->data;
-            newList->Append (newData);
-            tmp = tmp->next;
-        }
-        return newList;
+            for (int i = 0; i < newSize; i++)
+            {
+                T newData = tmp->data;
+                newList->Append(newData);
+                tmp = tmp->next;
+            }
+            return newList;
         }
     };
 
@@ -93,8 +97,7 @@ LinkedList<T>::LinkedList(T *items, int count) : head(nullptr), tail(nullptr), s
 {
     for (int i = 0; i < count; ++i)
     {
-        Node<T> *newNode = new Node<T>;
-        newNode->data = items[i];
+        Node<T> *newNode = new Node<T>(items[i]);
         if (!head)
         {
             head = tail = newNode;
@@ -118,7 +121,7 @@ LinkedList<T>::LinkedList(const LinkedList<T> &list) : LinkedList()
         while (tmp != nullptr)
         {
             newData = tmp->data;
-            Append(newdata);
+            Append(newData);
             tmp = tmp->next;
         }
     }
@@ -127,8 +130,7 @@ LinkedList<T>::LinkedList(const LinkedList<T> &list) : LinkedList()
 template <typename T>
 void LinkedList<T>::Append(T item)
 {
-    Node<T> *newTail = new Node<T>;
-    newTail->data = item;
+    Node<T> *newTail = new Node<T>(item);
     if (size == 0)
     {
         head = newTail;
@@ -146,14 +148,13 @@ void LinkedList<T>::Append(T item)
 template <typename T>
 void LinkedList<T>::Prepend(T item)
 {
-    Node<T> *newTail = new Node<T>;
-    newTail->data = item;
-    if (size = 0)
+    Node<T> *newHead = new Node<T>(item);
+    if (size == 0)
     {
         head = newHead;
         tail = newHead;
     }
-    else if
+    else
     {
         head->prev = newHead;
         newHead->next = head;
@@ -164,29 +165,37 @@ void LinkedList<T>::Prepend(T item)
 template <typename T>
 void LinkedList<T>::InsertAt(T item, int index)
 {
-    if (index > size || index < 0) throw std::out_of_range ("Индекс вставки неверный");
-    if (index == 0) Prepend(item);
-    else if (index == size) Append(item);
-    Node<T>* old = new Node<T>(item);
-    else if (size == 0) head = tail = old;
-
+    if (index > size || index < 0)
+        throw std::out_of_range("Индекс вставки неверный");
+    else if (index == 0)
+    {
+        Prepend(item);
+            return;
+    }
+    else if (index == size)
+    {
+        Append(item);
+        return;
+    }
+    Node<T> *current = head;
     for (int i = 0; i < index; i++)
     {
-        old = old.next;
+        current = current->next;
     }
-    Node<T> newNode = Node(item);
-    newNode.next = old;
-    newNode.prev = old->prev;
-    old.prev = newNode;
+    Node<T> *newNode = new Node<T>(item);
+    newNode->next = current;
+    newNode->prev = current->prev;
+    current->prev->next = newNode;
+    current->prev = newNode;
     size++;
 };
 
 template <typename T>
 void LinkedList<T>::Concat(LinkedList<T> &list)
 {
-    if (list.size = 0)
+    if (list.size == 0)
         return;
-    else if (size = 0)
+    else if (size == 0)
     {
         head = list.head;
         tail = list.tail;
