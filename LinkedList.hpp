@@ -36,18 +36,20 @@ public:
             head = temp;
         }
     };
-    Node<T> GetFirst()
+    T GetFirst()
     {
-        return head;
+        if (size == 0) throw std::out_of_range("Нет элементов");
+        return head->data;
     };
-    Node<T> GetLast()
+    T GetLast()
     {
-        return tail;
+        if (size == 0) throw std::out_of_range("Нет элементов");
+        return tail->data;
     };
     T Get(int index)
     {
         if (index < 0 || index >= size)
-            throw std::invalid_argument("Индекс не может быть < 0");
+            throw std::invalid_argument("Индекс не может быть < 0 или больше/равен размеру");
         Node<T> *temp = head;
         for (int i = 0; i < index; i++)
         {
@@ -61,13 +63,9 @@ public:
         LinkedList<T> *newList = new LinkedList<T>();
         if (startIndex < 0 || endIndex >= size || startIndex > endIndex)
             throw std::out_of_range("Передаваемые параметры startIndex и/или endIndex - некорректны");
-        else if (startIndex == endIndex)
-        {
-            return newList;
-        }
         else
         {
-            int newSize = endIndex - startIndex;
+            int newSize = endIndex - startIndex + 1;
             Node<T> *tmp = head;
             for (int i = 0; i < startIndex; i++)
                 tmp = tmp->next;
@@ -114,7 +112,7 @@ LinkedList<T>::LinkedList(T *items, int count) : head(nullptr), tail(nullptr), s
 template <typename T>
 LinkedList<T>::LinkedList(const LinkedList<T> &list) : LinkedList()
 {
-    if (size != 0)
+    if (list->size != 0)
     {
         Node<T> *tmp = list.head;
         T newData;
