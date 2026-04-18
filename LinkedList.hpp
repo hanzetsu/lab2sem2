@@ -38,47 +38,19 @@ public:
     };
     T GetFirst()
     {
-        if (size == 0) throw std::out_of_range("Нет элементов");
+        if (size == 0)
+            throw std::out_of_range("Нет элементов");
         return head->data;
     };
     T GetLast()
     {
-        if (size == 0) throw std::out_of_range("Нет элементов");
+        if (size == 0)
+            throw std::out_of_range("Нет элементов");
         return tail->data;
     };
-    T Get(int index)
-    {
-        if (index < 0 || index >= size)
-            throw std::invalid_argument("Индекс не может быть < 0 или больше/равен размеру");
-        Node<T> *temp = head;
-        for (int i = 0; i < index; i++)
-        {
-            temp = temp->next;
-        }
-        return temp->data;
-    };
+    T Get(int index);
 
-    LinkedList<T> *GetSubList(int startIndex, int endIndex)
-    {
-        LinkedList<T> *newList = new LinkedList<T>();
-        if (startIndex < 0 || endIndex >= size || startIndex > endIndex)
-            throw std::out_of_range("Передаваемые параметры startIndex и/или endIndex - некорректны");
-        else
-        {
-            int newSize = endIndex - startIndex + 1;
-            Node<T> *tmp = head;
-            for (int i = 0; i < startIndex; i++)
-                tmp = tmp->next;
-
-            for (int i = 0; i < newSize; i++)
-            {
-                T newData = tmp->data;
-                newList->Append(newData);
-                tmp = tmp->next;
-            }
-            return newList;
-        }
-    };
+    LinkedList<T> *GetSubList(int startIndex, int endIndex);
 
     int GetLength()
     {
@@ -88,6 +60,18 @@ public:
     void Prepend(T item);
     void InsertAt(T item, int index);
     void Concat(LinkedList<T> &list);
+};
+template <typename T>
+T LinkedList<T>::Get(int index)
+{
+    if (index < 0 || index >= size)
+        throw std::invalid_argument("Индекс не может быть < 0 или больше/равен размеру");
+    Node<T> *temp = head;
+    for (int i = 0; i < index; i++)
+    {
+        temp = temp->next;
+    }
+    return temp->data;
 };
 
 template <typename T>
@@ -124,6 +108,28 @@ LinkedList<T>::LinkedList(const LinkedList<T> &list) : LinkedList()
         }
     }
 }
+template <typename T>
+LinkedList<T> *LinkedList<T>::GetSubList(int startIndex, int endIndex)
+{
+    LinkedList<T> *newList = new LinkedList<T>();
+    if (startIndex < 0 || endIndex >= size || startIndex > endIndex)
+        throw std::out_of_range("Передаваемые параметры startIndex и/или endIndex - некорректны");
+    else
+    {
+        int newSize = endIndex - startIndex + 1;
+        Node<T> *tmp = head;
+        for (int i = 0; i < startIndex; i++)
+            tmp = tmp->next;
+
+        for (int i = 0; i < newSize; i++)
+        {
+            T newData = tmp->data;
+            newList->Append(newData);
+            tmp = tmp->next;
+        }
+        return newList;
+    }
+};
 
 template <typename T>
 void LinkedList<T>::Append(T item)
@@ -168,7 +174,7 @@ void LinkedList<T>::InsertAt(T item, int index)
     else if (index == 0)
     {
         Prepend(item);
-            return;
+        return;
     }
     else if (index == size)
     {
