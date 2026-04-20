@@ -1,3 +1,4 @@
+#pragma once
 #include "DynamicArray.hpp"
 #include "Sequence.hpp"
 
