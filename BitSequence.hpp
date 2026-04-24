@@ -4,7 +4,6 @@
 #include "Bit.hpp"
 #include <cstdint>
 #include <stdexcept>
-#include <algorithm>
 
 class BitSequence : public Sequence<Bit>
 {
@@ -12,56 +11,47 @@ private:
     DynamicArray<uint8_t> *bytes;
     int bitLength;
 
-    // Вспомогательные методы
     static int byteIndex(int bitIndex) noexcept { return bitIndex / 8; }
     static int bitOffset(int bitIndex) noexcept { return bitIndex % 8; }
-    static uint8_t mask(int bitOffset) noexcept { return 1 << bitOffset; }
+    static uint8_t mask(int offset) noexcept { return 1 << offset; }
 
-    // Конструктор, принимающий уже готовый DynamicArray<uint8_t> и длину (для внутреннего использования)
-    BitSequence(DynamicArray<uint8_t>* arr, int length) : bytes(arr), bitLength(length) {}
+    // Внутренний конструктор для создания из существующего массива байт
+    BitSequence(DynamicArray<uint8_t> *arr, int length) : bytes(arr), bitLength(length) {}
 
 public:
-    // Конструкторы
     BitSequence() : bytes(new DynamicArray<uint8_t>(0)), bitLength(0) {}
 
     BitSequence(int size, Bit initialValue = Bit::zero)
         : bytes(new DynamicArray<uint8_t>((size + 7) / 8)), bitLength(size)
     {
-        uint8_t fillByte = (initialValue == Bit::one) ? 0xFF : 0x00;
+        uint8_t fill = (initialValue == Bit::one) ? 0xFF : 0x00;
         for (int i = 0; i < bytes->GetSize(); ++i)
-            bytes->Set(i, fillByte);
-        // Если size не кратен 8, нужно обнулить лишние биты в последнем байте
-        if (size % 8 != 0 && initialValue == Bit::one) {
+            bytes->Set(i, fill);
+        if (size % 8 != 0 && initialValue == Bit::one)
+        {
             int lastIdx = bytes->GetSize() - 1;
             uint8_t lastByte = bytes->Get(lastIdx);
-            int bitsToKeep = size % 8;
-            uint8_t mask = (1 << bitsToKeep) - 1;
-            lastByte &= mask;
+            lastByte &= (1 << (size % 8)) - 1;
             bytes->Set(lastIdx, lastByte);
         }
     }
 
-    BitSequence(const Bit* bits, int count) : BitSequence(count)
+    BitSequence(const Bit *bits, int count) : BitSequence(count)
     {
         for (int i = 0; i < count; ++i)
-        {
             if (bits[i] == Bit::one)
             {
-                int byteIdx = byteIndex(i);
-                int bitOff = bitOffset(i);
-                uint8_t byte = bytes->Get(byteIdx);
-                byte |= mask(bitOff);
-                bytes->Set(byteIdx, byte);
+                int idx = byteIndex(i), off = bitOffset(i);
+                uint8_t b = bytes->Get(idx);
+                b |= mask(off);
+                bytes->Set(idx, b);
             }
-        }
     }
 
-    // Конструктор копирования (глубокое копирование)
-    BitSequence(const BitSequence& other)
+    BitSequence(const BitSequence &other)
         : bytes(new DynamicArray<uint8_t>(*other.bytes)), bitLength(other.bitLength) {}
 
-    // Оператор присваивания с глубоким копированием (защита от самоприсваивания)
-    BitSequence& operator=(const BitSequence& other)
+    BitSequence &operator=(const BitSequence &other)
     {
         if (this != &other)
         {
@@ -72,282 +62,235 @@ public:
         return *this;
     }
 
-    // Деструктор
-    ~BitSequence() override
-    {
-        delete bytes;
-    }
+    ~BitSequence() override { delete bytes; }
 
-    // Методы доступа
     Bit GetFirst() const override
     {
         if (bitLength == 0)
-            throw std::out_of_range("BitSequence is empty");
+            throw std::out_of_range("Последовательность битов пуста");
         return Get(0);
     }
 
     Bit GetLast() const override
     {
         if (bitLength == 0)
-            throw std::out_of_range("BitSequence is empty");
+            throw std::out_of_range("Последовательность битов пуста");
         return Get(bitLength - 1);
     }
 
     Bit Get(int index) const override
     {
         if (index < 0 || index >= bitLength)
-            throw std::out_of_range("Index out of range");
+            throw std::out_of_range("Индекс вне диапазона");
         int byteIdx = byteIndex(index);
         int bitOff = bitOffset(index);
         uint8_t byte = bytes->Get(byteIdx);
         return (byte & mask(bitOff)) ? Bit::one : Bit::zero;
     }
 
-    int GetLength() const override
-    {
-        return bitLength;
-    }
+    int GetLength() const override { return bitLength; }
 
-    // Immutable операции – создают новый объект, не изменяя текущий
-    Sequence<Bit>* GetSubsequence(int startIndex, int endIndex) const override
+    Sequence<Bit> *GetSubsequence(int startIndex, int endIndex) const override
     {
-        // endIndex – исключительный (как в стандартной практике C++)
-        if (startIndex < 0 || endIndex > bitLength || startIndex > endIndex)
-            throw std::out_of_range("Invalid subsequence indices");
-        int newSize = endIndex - startIndex;
-        BitSequence* sub = new BitSequence(newSize);
+        if (startIndex < 0 || endIndex >= bitLength || startIndex > endIndex)
+            throw std::out_of_range("Неверные индексы подпоследовательности");
+        int newSize = endIndex - startIndex + 1;
+        BitSequence *sub = new BitSequence(newSize);
         for (int i = 0; i < newSize; ++i)
         {
-            Bit b = Get(startIndex + i);
-            if (b == Bit::one)
+            if (Get(startIndex + i) == Bit::one)
             {
                 int byteIdx = byteIndex(i);
                 int bitOff = bitOffset(i);
-                uint8_t byte = sub->bytes->Get(byteIdx);
-                byte |= mask(bitOff);
-                sub->bytes->Set(byteIdx, byte);
+                uint8_t b = sub->bytes->Get(byteIdx);
+                b |= mask(bitOff);
+                sub->bytes->Set(byteIdx, b);
             }
         }
         return sub;
     }
 
-    Sequence<Bit>* Append(Bit item) override
+    // Immutable методы (не меняют текущий объект)
+    Sequence<Bit> *Append(Bit item) override
     {
-        BitSequence* result = new BitSequence(*this);
-        int newBitIndex = result->bitLength;
-        int byteIdx = byteIndex(newBitIndex);
-        int bitOff = bitOffset(newBitIndex);
+        BitSequence *newSeq = new BitSequence(*this);
+        int idx = newSeq->bitLength;
+        int byteIdx = byteIndex(idx);
+        int bitOff = bitOffset(idx);
         if (bitOff == 0)
         {
-            int oldSize = result->bytes->GetSize();
-            result->bytes->Resize(oldSize + 1);
-            result->bytes->Set(oldSize, 0);
+            int oldSize = newSeq->bytes->GetSize();
+            newSeq->bytes->Resize(oldSize + 1);
+            newSeq->bytes->Set(oldSize, 0);
         }
-        uint8_t byte = result->bytes->Get(byteIdx);
+        uint8_t b = newSeq->bytes->Get(byteIdx);
         if (item == Bit::one)
-            byte |= mask(bitOff);
-        result->bytes->Set(byteIdx, byte);
-        result->bitLength++;
-        return result;
+            b |= mask(bitOff);
+        newSeq->bytes->Set(byteIdx, b);
+        newSeq->bitLength++;
+        return newSeq;
     }
 
-    Sequence<Bit>* Prepend(Bit item) override
+    Sequence<Bit> *Prepend(Bit item) override
     {
-        BitSequence* result = new BitSequence(bitLength + 1);
-        // Установить первый бит
+        BitSequence *newSeq = new BitSequence(bitLength + 1);
+        // Устанавливаем первый бит
         if (item == Bit::one)
         {
-            uint8_t byte = result->bytes->Get(0);
-            byte |= mask(0);
-            result->bytes->Set(0, byte);
+            uint8_t b = newSeq->bytes->Get(0);
+            b |= mask(0);
+            newSeq->bytes->Set(0, b);
         }
-        // Скопировать старые биты со сдвигом вправо
+        // Копируем старые биты со сдвигом
         for (int i = 0; i < bitLength; ++i)
-        {
-            Bit b = Get(i);
-            if (b == Bit::one)
+            if (Get(i) == Bit::one)
             {
                 int newIdx = i + 1;
                 int byteIdx = byteIndex(newIdx);
                 int bitOff = bitOffset(newIdx);
-                uint8_t byte = result->bytes->Get(byteIdx);
-                byte |= mask(bitOff);
-                result->bytes->Set(byteIdx, byte);
+                uint8_t b = newSeq->bytes->Get(byteIdx);
+                b |= mask(bitOff);
+                newSeq->bytes->Set(byteIdx, b);
             }
-        }
-        return result;
+        return newSeq;
     }
 
-    Sequence<Bit>* InsertAt(Bit item, int index) override
+    Sequence<Bit> *InsertAt(Bit item, int index) override
     {
         if (index < 0 || index > bitLength)
-            throw std::out_of_range("Invalid index for InsertAt");
-
-        BitSequence* result = new BitSequence(bitLength + 1);
+            throw std::out_of_range("Неверный индекс вставки");
+        BitSequence *newSeq = new BitSequence(bitLength + 1);
         // Копируем биты до index
         for (int i = 0; i < index; ++i)
-        {
             if (Get(i) == Bit::one)
             {
                 int byteIdx = byteIndex(i);
                 int bitOff = bitOffset(i);
-                uint8_t byte = result->bytes->Get(byteIdx);
-                byte |= mask(bitOff);
-                result->bytes->Set(byteIdx, byte);
+                uint8_t b = newSeq->bytes->Get(byteIdx);
+                b |= mask(bitOff);
+                newSeq->bytes->Set(byteIdx, b);
             }
-        }
         // Вставляем item
         if (item == Bit::one)
         {
             int byteIdx = byteIndex(index);
             int bitOff = bitOffset(index);
-            uint8_t byte = result->bytes->Get(byteIdx);
-            byte |= mask(bitOff);
-            result->bytes->Set(byteIdx, byte);
+            uint8_t b = newSeq->bytes->Get(byteIdx);
+            b |= mask(bitOff);
+            newSeq->bytes->Set(byteIdx, b);
         }
         // Копируем биты после index
         for (int i = index; i < bitLength; ++i)
-        {
             if (Get(i) == Bit::one)
             {
                 int newIdx = i + 1;
                 int byteIdx = byteIndex(newIdx);
                 int bitOff = bitOffset(newIdx);
-                uint8_t byte = result->bytes->Get(byteIdx);
-                byte |= mask(bitOff);
-                result->bytes->Set(byteIdx, byte);
+                uint8_t b = newSeq->bytes->Get(byteIdx);
+                b |= mask(bitOff);
+                newSeq->bytes->Set(byteIdx, b);
             }
-        }
-        return result;
+        return newSeq;
     }
 
-    Sequence<Bit>* Concat(Sequence<Bit>* list) const override
+    Sequence<Bit> *Concat(Sequence<Bit> *seq) const override
     {
-        if (!list)
-            throw std::invalid_argument("Concat: null pointer");
-
-        int otherLen = list->GetLength();
-        BitSequence* result = new BitSequence(bitLength + otherLen);
+        if (!seq)
+            throw std::invalid_argument("Пустой указатель на последовательность");
+        int otherLen = seq->GetLength();
+        BitSequence *result = new BitSequence(bitLength + otherLen);
         // Копируем текущие биты
         for (int i = 0; i < bitLength; ++i)
-        {
             if (Get(i) == Bit::one)
             {
                 int byteIdx = byteIndex(i);
                 int bitOff = bitOffset(i);
-                uint8_t byte = result->bytes->Get(byteIdx);
-                byte |= mask(bitOff);
-                result->bytes->Set(byteIdx, byte);
+                uint8_t b = result->bytes->Get(byteIdx);
+                b |= mask(bitOff);
+                result->bytes->Set(byteIdx, b);
             }
-        }
-        // Копируем биты из list
+        // Копируем биты из seq
         for (int i = 0; i < otherLen; ++i)
-        {
-            if (list->Get(i) == Bit::one)
+            if (seq->Get(i) == Bit::one)
             {
                 int idx = bitLength + i;
                 int byteIdx = byteIndex(idx);
                 int bitOff = bitOffset(idx);
-                uint8_t byte = result->bytes->Get(byteIdx);
-                byte |= mask(bitOff);
-                result->bytes->Set(byteIdx, byte);
+                uint8_t b = result->bytes->Get(byteIdx);
+                b |= mask(bitOff);
+                result->bytes->Set(byteIdx, b);
             }
-        }
         return result;
     }
 
-    // Побитовые операции (immutable, возвращают новый объект)
-    BitSequence* And(const BitSequence& other) const
+    // Побитовые операции
+    BitSequence *And(const BitSequence &other) const
     {
         if (bitLength != other.bitLength)
-            throw std::invalid_argument("AND: sequences must have same length");
-        BitSequence* result = new BitSequence(bitLength);
+            throw std::invalid_argument("Длины последовательностей не совпадают");
+        BitSequence *res = new BitSequence(bitLength);
         int numBytes = bytes->GetSize();
         for (int i = 0; i < numBytes; ++i)
-        {
-            uint8_t b1 = bytes->Get(i);
-            uint8_t b2 = other.bytes->Get(i);
-            result->bytes->Set(i, b1 & b2);
-        }
-        // Обнулить лишние биты в последнем байте, если нужно
+            res->bytes->Set(i, bytes->Get(i) & other.bytes->Get(i));
         if (bitLength % 8 != 0)
         {
             int lastIdx = numBytes - 1;
-            uint8_t lastByte = result->bytes->Get(lastIdx);
-            int bitsToKeep = bitLength % 8;
-            uint8_t maskLast = (1 << bitsToKeep) - 1;
-            lastByte &= maskLast;
-            result->bytes->Set(lastIdx, lastByte);
+            uint8_t lastByte = res->bytes->Get(lastIdx);
+            lastByte &= (1 << (bitLength % 8)) - 1;
+            res->bytes->Set(lastIdx, lastByte);
         }
-        return result;
+        return res;
     }
 
-    BitSequence* Or(const BitSequence& other) const
+    BitSequence *Or(const BitSequence &other) const
     {
         if (bitLength != other.bitLength)
-            throw std::invalid_argument("OR: sequences must have same length");
-        BitSequence* result = new BitSequence(bitLength);
+            throw std::invalid_argument("Длины последовательностей не совпадают");
+        BitSequence *res = new BitSequence(bitLength);
         int numBytes = bytes->GetSize();
         for (int i = 0; i < numBytes; ++i)
-        {
-            uint8_t b1 = bytes->Get(i);
-            uint8_t b2 = other.bytes->Get(i);
-            result->bytes->Set(i, b1 | b2);
-        }
+            res->bytes->Set(i, bytes->Get(i) | other.bytes->Get(i));
         if (bitLength % 8 != 0)
         {
             int lastIdx = numBytes - 1;
-            uint8_t lastByte = result->bytes->Get(lastIdx);
-            int bitsToKeep = bitLength % 8;
-            uint8_t maskLast = (1 << bitsToKeep) - 1;
-            lastByte &= maskLast;
-            result->bytes->Set(lastIdx, lastByte);
+            uint8_t lastByte = res->bytes->Get(lastIdx);
+            lastByte &= (1 << (bitLength % 8)) - 1;
+            res->bytes->Set(lastIdx, lastByte);
         }
-        return result;
+        return res;
     }
 
-    BitSequence* Xor(const BitSequence& other) const
+    BitSequence *Xor(const BitSequence &other) const
     {
         if (bitLength != other.bitLength)
-            throw std::invalid_argument("XOR: sequences must have same length");
-        BitSequence* result = new BitSequence(bitLength);
+            throw std::invalid_argument("Длины последовательностей не совпадают");
+        BitSequence *res = new BitSequence(bitLength);
         int numBytes = bytes->GetSize();
         for (int i = 0; i < numBytes; ++i)
-        {
-            uint8_t b1 = bytes->Get(i);
-            uint8_t b2 = other.bytes->Get(i);
-            result->bytes->Set(i, b1 ^ b2);
-        }
+            res->bytes->Set(i, bytes->Get(i) ^ other.bytes->Get(i));
         if (bitLength % 8 != 0)
         {
             int lastIdx = numBytes - 1;
-            uint8_t lastByte = result->bytes->Get(lastIdx);
-            int bitsToKeep = bitLength % 8;
-            uint8_t maskLast = (1 << bitsToKeep) - 1;
-            lastByte &= maskLast;
-            result->bytes->Set(lastIdx, lastByte);
+            uint8_t lastByte = res->bytes->Get(lastIdx);
+            lastByte &= (1 << (bitLength % 8)) - 1;
+            res->bytes->Set(lastIdx, lastByte);
         }
-        return result;
+        return res;
     }
 
-    BitSequence* Not() const
+    BitSequence *Not() const
     {
-        BitSequence* result = new BitSequence(bitLength);
+        BitSequence *res = new BitSequence(bitLength);
         int numBytes = bytes->GetSize();
         for (int i = 0; i < numBytes; ++i)
-        {
-            uint8_t b = bytes->Get(i);
-            result->bytes->Set(i, ~b);
-        }
+            res->bytes->Set(i, ~bytes->Get(i));
         if (bitLength % 8 != 0)
         {
             int lastIdx = numBytes - 1;
-            uint8_t lastByte = result->bytes->Get(lastIdx);
-            int bitsToKeep = bitLength % 8;
-            uint8_t maskLast = (1 << bitsToKeep) - 1;
-            lastByte &= maskLast;
-            result->bytes->Set(lastIdx, lastByte);
+            uint8_t lastByte = res->bytes->Get(lastIdx);
+            lastByte &= (1 << (bitLength % 8)) - 1;
+            res->bytes->Set(lastIdx, lastByte);
         }
-        return result;
+        return res;
     }
 };
