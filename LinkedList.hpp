@@ -49,30 +49,24 @@ public:
         return tail->data;
     };
     T Get(int index);
-
     LinkedList<T> *GetSubList(int startIndex, int endIndex);
-
-    int GetLength()
-    {
-        return size;
-    };
+    int GetLength() { return size; }
     void Append(T item);
     void Prepend(T item);
     void InsertAt(T item, int index);
     void Concat(LinkedList<T> &list);
 };
+
 template <typename T>
 T LinkedList<T>::Get(int index)
 {
     if (index < 0 || index >= size)
-        throw std::invalid_argument("Индекс не может быть < 0 или больше/равен размеру");
+        throw std::out_of_range("Индекс вне диапазона");
     Node<T> *temp = head;
     for (int i = 0; i < index; i++)
-    {
         temp = temp->next;
-    }
     return temp->data;
-};
+}
 
 template <typename T>
 LinkedList<T>::LinkedList(T *items, int count) : head(nullptr), tail(nullptr), size(0)
@@ -81,9 +75,7 @@ LinkedList<T>::LinkedList(T *items, int count) : head(nullptr), tail(nullptr), s
     {
         Node<T> *newNode = new Node<T>(items[i]);
         if (!head)
-        {
             head = tail = newNode;
-        }
         else
         {
             tail->next = newNode;
@@ -93,53 +85,41 @@ LinkedList<T>::LinkedList(T *items, int count) : head(nullptr), tail(nullptr), s
         size++;
     }
 }
+
 template <typename T>
 LinkedList<T>::LinkedList(const LinkedList<T> &list) : LinkedList()
 {
-    if (list->size != 0)
+    Node<T> *tmp = list.head;
+    while (tmp != nullptr)
     {
-        Node<T> *tmp = list.head;
-        T newData;
-        while (tmp != nullptr)
-        {
-            newData = tmp->data;
-            Append(newData);
-            tmp = tmp->next;
-        }
+        Append(tmp->data);
+        tmp = tmp->next;
     }
 }
+
 template <typename T>
 LinkedList<T> *LinkedList<T>::GetSubList(int startIndex, int endIndex)
 {
-    LinkedList<T> *newList = new LinkedList<T>();
     if (startIndex < 0 || endIndex >= size || startIndex > endIndex)
-        throw std::out_of_range("Передаваемые параметры startIndex и/или endIndex - некорректны");
-    else
+        throw std::out_of_range("Неверные индексы подсписка");
+    LinkedList<T> *newList = new LinkedList<T>();
+    Node<T> *tmp = head;
+    for (int i = 0; i < startIndex; i++)
+        tmp = tmp->next;
+    for (int i = startIndex; i <= endIndex; i++)
     {
-        int newSize = endIndex - startIndex + 1;
-        Node<T> *tmp = head;
-        for (int i = 0; i < startIndex; i++)
-            tmp = tmp->next;
-
-        for (int i = 0; i < newSize; i++)
-        {
-            T newData = tmp->data;
-            newList->Append(newData);
-            tmp = tmp->next;
-        }
-        return newList;
+        newList->Append(tmp->data);
+        tmp = tmp->next;
     }
-};
+    return newList;
+}
 
 template <typename T>
 void LinkedList<T>::Append(T item)
 {
     Node<T> *newTail = new Node<T>(item);
     if (size == 0)
-    {
-        head = newTail;
-        tail = newTail;
-    }
+        head = tail = newTail;
     else
     {
         tail->next = newTail;
@@ -147,17 +127,14 @@ void LinkedList<T>::Append(T item)
         tail = newTail;
     }
     size++;
-};
+}
 
 template <typename T>
 void LinkedList<T>::Prepend(T item)
 {
     Node<T> *newHead = new Node<T>(item);
     if (size == 0)
-    {
-        head = newHead;
-        tail = newHead;
-    }
+        head = tail = newHead;
     else
     {
         head->prev = newHead;
@@ -166,52 +143,50 @@ void LinkedList<T>::Prepend(T item)
     }
     size++;
 }
+
 template <typename T>
 void LinkedList<T>::InsertAt(T item, int index)
 {
-    if (index > size || index < 0)
-        throw std::out_of_range("Индекс вставки неверный");
-    else if (index == 0)
+    if (index < 0 || index > size)
+        throw std::out_of_range("Неверный индекс вставки");
+    if (index == 0)
     {
         Prepend(item);
         return;
     }
-    else if (index == size)
+    if (index == size)
     {
         Append(item);
         return;
     }
     Node<T> *current = head;
     for (int i = 0; i < index; i++)
-    {
         current = current->next;
-    }
     Node<T> *newNode = new Node<T>(item);
     newNode->next = current;
     newNode->prev = current->prev;
     current->prev->next = newNode;
     current->prev = newNode;
     size++;
-};
+}
 
 template <typename T>
 void LinkedList<T>::Concat(LinkedList<T> &list)
 {
     if (list.size == 0)
         return;
-    else if (size == 0)
+    if (size == 0)
     {
         head = list.head;
         tail = list.tail;
     }
     else
     {
-        this->tail->next = list.head;
-        list.head->prev = this->tail;
-        this->tail = list.tail;
+        tail->next = list.head;
+        list.head->prev = tail;
+        tail = list.tail;
     }
-    size = size + list.size;
-    list.head = nullptr;
-    list.tail = nullptr;
+    size += list.size;
+    list.head = list.tail = nullptr;
     list.size = 0;
-};
+}

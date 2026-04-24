@@ -9,22 +9,25 @@ private:
     LinkedList<T> *list;
 
 public:
-    ListSequence(T *items, int count) : list(new LinkedList<T>(items, count)) {}
-    ListSequence() : list(new LinkedList<T>()) {}
-    ListSequence(const ListSequence &other) : list(new LinkedList<T>(*other.list)) {}
-
-    ~ListSequence()
+    MutableListSequence(T *items, int count) : list(new LinkedList<T>(items, count)) {}
+    MutableListSequence() : list(new LinkedList<T>()) {}
+    MutableListSequence(const MutableListSequence &other) : list(new LinkedList<T>(*other.list)) {}
+    ~MutableListSequence()
     {
         delete list;
     }
 
     T GetFirst() const override
     {
+        if (GetLength() == 0)
+            throw std::out_of_range("Последовательность пуста");
         return list->GetFirst();
     }
 
     T GetLast() const override
     {
+        if (GetLength() == 0)
+            throw std::out_of_range("Последовательность пуста");
         return list->GetLast();
     }
 
@@ -41,7 +44,7 @@ public:
     Sequence<T> *GetSubsequence(int startIndex, int endIndex) const override
     {
         LinkedList<T> *subList = list->GetSubList(startIndex, endIndex);
-        ListSequence<T> *result = new ListSequence<T>();
+        MutableListSequence<T> *result = new MutableListSequence<T>();
         delete result->list;
         result->list = subList;
         return result;
@@ -67,11 +70,10 @@ public:
 
     Sequence<T> *Concat(Sequence<T> *seq) const override
     {
-        const ListSequence<T> *other = dynamic_cast<const ListSequence<T> *>(seq);
+        const MutableListSequence<T> *other = dynamic_cast<const MutableListSequence<T> *>(seq);
         if (!other)
-            throw std::invalid_argument("Неверный тип последовательности");
-
-        ListSequence<T> *result = new ListSequence<T>(*this);
+            throw std::invalid_argument("Неверный тип последовательности для конкатенации");
+        MutableListSequence<T> *result = new MutableListSequence<T>(*this);
         result->list->Concat(*other->list);
         return result;
     }
