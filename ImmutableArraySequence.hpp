@@ -12,6 +12,7 @@ public:
     ImmutableArraySequence(T *items, int count) : data(new DynamicArray<T>(items, count)) {}
     ImmutableArraySequence(int size) : data(new DynamicArray<T>(size)) {}
     ImmutableArraySequence(const ImmutableArraySequence &other) : data(new DynamicArray<T>(*other.data)) {}
+    ImmutableArraySequence() : data(new DynamicArray<T>(0)) {}
     ~ImmutableArraySequence() { delete data; }
 
     T GetFirst() const override

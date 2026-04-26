@@ -13,6 +13,7 @@ public:
     MutableArraySequence(int size) : data(new DynamicArray<T>(size)) {}
     MutableArraySequence(const MutableArraySequence &other) : data(new DynamicArray<T>(*other.data)) {}
     ~MutableArraySequence() { delete data; }
+    MutableArraySequence() : data(new DynamicArray<T>(0)) {}
 
     T GetFirst() const override
     {

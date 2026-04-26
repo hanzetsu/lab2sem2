@@ -11,7 +11,7 @@ private:
     DynamicArray<uint8_t> *bytes;
     int bitLength;
 
-    static int byteIndex(int bitIndex) noexcept { return bitIndex / 8; }
+    static int byteIndex(int bitIndex) noexcept { return bitIndex / 8; }    
     static int bitOffset(int bitIndex) noexcept { return bitIndex % 8; }
     static uint8_t mask(int offset) noexcept { return 1 << offset; }
 

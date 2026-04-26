@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>443</width>
+    <height>462</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>270</y>
+      <width>160</width>
+      <height>146</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPushButton" name="getButton">
+       <property name="text">
+        <string>Get</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="appendButton">
+       <property name="text">
+        <string>Append</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="prependButton">
+       <property name="text">
+        <string>Prepend</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="insertAtButton">
+       <property name="text">
+        <string>Insert At</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="clearButton">
+       <property name="text">
+        <string>Clear</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QListWidget" name="listWidget">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>20</y>
+      <width>51</width>
+      <height>241</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>310</y>
+      <width>160</width>
+      <height>112</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QLineEdit" name="valueLineEdit"/>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="indexSpinBox"/>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QLabel" name="statusLabel">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>0</y>
+      <width>158</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="typeComboBox">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>10</y>
+      <width>158</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="dataTypeComboBox">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>10</y>
+      <width>62</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>443</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

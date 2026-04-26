@@ -12,6 +12,7 @@ public:
     MutableListSequence(T *items, int count) : list(new LinkedList<T>(items, count)) {}
     MutableListSequence() : list(new LinkedList<T>()) {}
     MutableListSequence(const MutableListSequence &other) : list(new LinkedList<T>(*other.list)) {}
+
     ~MutableListSequence()
     {
         delete list;

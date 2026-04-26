@@ -1,0 +1,10 @@
+Bit.hpp
+BitSequence.hpp
+DynamicArray.hpp
+ImmutableArraySequence.hpp
+ImmutableListSequence.hpp
+LinkedList.hpp
+MutableArraySequence.hpp
+MutableListSequence.hpp
+Sequence.hpp
+test.cpp
