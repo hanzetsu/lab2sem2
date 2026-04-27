@@ -1,5 +1,4 @@
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
+#pragma once
 
 #include <QMainWindow>
 #include <QMessageBox>
@@ -52,4 +51,3 @@ private:
     void createNewSequence();   // создаёт последовательность согласно currentSeqType и currentDataType
 };
 
-#endif // MAINWINDOW_HPP
