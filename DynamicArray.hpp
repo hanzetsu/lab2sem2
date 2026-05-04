@@ -8,11 +8,11 @@ class DynamicArray
 private:
     T *data;
     int size;
-    int capacity;
 
 public:
     DynamicArray(T *items, int count);
     DynamicArray(int size);
+    DynamicArray() : data(nullptr), size(0) {}
     DynamicArray(const DynamicArray<T> &other);
     ~DynamicArray()
     {
@@ -23,6 +23,7 @@ public:
     {
         return size;
     }
+    T* GetRawData() const { return data; }
     void Set(int index, T value);
     void Resize(int newSize);
 };
@@ -32,7 +33,6 @@ DynamicArray<T>::DynamicArray(int size)
     if (size < 0)
         throw std::invalid_argument("Размер не может быть < 0");
     this->size = size;
-    capacity = size;
     data = new T[size];
 };
 template <typename T>
@@ -60,7 +60,6 @@ DynamicArray<T>::DynamicArray(T *items, int count)
         throw std::invalid_argument("Нулевой указатель");
     size = count;
     data = new T[size];
-    capacity = size;
     for (int i = 0; i < count; i++)
     {
         data[i] = items[i];
@@ -68,7 +67,7 @@ DynamicArray<T>::DynamicArray(T *items, int count)
 }
 
 template <typename T>
-DynamicArray<T>::DynamicArray(const DynamicArray<T> &other) : size(other.size), capacity(other.capacity), data(new T[capacity])
+DynamicArray<T>::DynamicArray(const DynamicArray<T> &other) : size(other.size),  data(new T[size])
 {
     for (int i = 0; i < size; i++)
     {
@@ -92,5 +91,4 @@ void DynamicArray<T>::Resize(int newSize)
     delete[] data;
     data = newData;
     size = newSize;
-    capacity = newSize;
 }
