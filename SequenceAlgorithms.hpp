@@ -2,7 +2,7 @@
 #include "DynamicArray.hpp"
 #include "Sequence.hpp"
 #include <stdexcept>
-#include <limits>   // добавлено
+#include <limits> 
 
 struct Stats
 {
@@ -17,7 +17,7 @@ Stats computeStats(const Sequence<T> &seq)
 {
     int n = seq.GetLength();
     if (n == 0) {
-        // Пустая последовательность – возвращаем нулевые значения (можно выбросить исключение по желанию)
+    
         return {0, 0, 0.0, 0};
     }
     Stats res = {seq.Get(0), seq.Get(0), 0.0, 0};
@@ -31,7 +31,6 @@ Stats computeStats(const Sequence<T> &seq)
     return res;
 }
 
-// Более эффективная быстрая сортировка (quick sort)
 template <typename T>
 void quickSort(DynamicArray<T> &arr, int left, int right)
 {
@@ -64,7 +63,6 @@ void sortDynamicArray(DynamicArray<T> &arr)
     quickSort(arr, 0, arr.GetSize() - 1);
 }
 
-// Функция для вычисления медианы последовательности
 template <typename T>
 double median(const Sequence<T> &seq)
 {
@@ -72,14 +70,12 @@ double median(const Sequence<T> &seq)
     if (n == 0)
         throw std::runtime_error("Пустая последовательность: невозможно вычислить медиану");
 
-    // Копируем элементы в DynamicArray
     DynamicArray<T> copy(n);
     for (int i = 0; i < n; ++i)
     {
         copy.Set(i, seq.Get(i));
     }
 
-    // Сортируем копию
     sortDynamicArray(copy);
 
     if (n % 2 == 1)

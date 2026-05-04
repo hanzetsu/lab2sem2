@@ -37,9 +37,8 @@ void printBitSequence(Sequence<Bit>* seq, const string& title)
     cout << "]" << endl;
 }
 
-// ----------------------------------------------------------------------
+
 // Тесты для DynamicArray
-// ----------------------------------------------------------------------
 void testDynamicArrayConstructionFromArray()
 {
     cout << "  Проверка конструктора от массива и методов Get/GetSize" << endl;
@@ -72,7 +71,6 @@ void testDynamicArrayResizeLarger()
     assert(arr.Get(0) == 5);
     assert(arr.Get(1) == 6);
     assert(arr.Get(2) == 7);
-    // Новые элементы не инициализированы, но мы можем их установить
     arr.Set(3, 8);
     arr.Set(4, 9);
     assert(arr.Get(3) == 8);
@@ -123,9 +121,7 @@ void testDynamicArray()
     testDynamicArrayExceptionOutOfRange();
 }
 
-// ----------------------------------------------------------------------
 // Тесты для LinkedList
-// ----------------------------------------------------------------------
 void testLinkedListConstructionAndGetters()
 {
     cout << "  Проверка конструктора от массива, GetFirst, GetLast, GetLength" << endl;
@@ -219,9 +215,7 @@ void testLinkedList()
     testLinkedListExceptionEmpty();
 }
 
-// ----------------------------------------------------------------------
 // Тесты для MutableArraySequence
-// ----------------------------------------------------------------------
 void testMutableArraySequenceBasic()
 {
     cout << "  Проверка базовых методов (GetFirst, GetLast, Get, GetLength)" << endl;
@@ -289,9 +283,7 @@ void testMutableArraySequence()
     testMutableArraySequenceConcat();
 }
 
-// ----------------------------------------------------------------------
 // Тесты для ImmutableArraySequence
-// ----------------------------------------------------------------------
 void testImmutableArraySequenceBasic()
 {
     cout << "  Проверка базовых методов (GetFirst, GetLast, Get, GetLength)" << endl;
@@ -351,10 +343,8 @@ void testImmutableArraySequence()
     testImmutableArraySequencePrepend();
     testImmutableArraySequenceInsertAt();
 }
+// Тесты для MutableListSequence
 
-// ----------------------------------------------------------------------
-// Тесты для MutableListSequence (аналогично MutableArraySequence)
-// ----------------------------------------------------------------------
 void testMutableListSequenceBasic()
 {
     cout << "  Проверка базовых методов" << endl;
@@ -389,9 +379,8 @@ void testMutableListSequence()
     testMutableListSequenceAppendPrependInsert();
 }
 
-// ----------------------------------------------------------------------
 // Тесты для ImmutableListSequence
-// ----------------------------------------------------------------------
+
 void testImmutableListSequenceBasic()
 {
     cout << "  Проверка базовых методов" << endl;
@@ -423,9 +412,8 @@ void testImmutableListSequence()
     testImmutableListSequenceAppend();
 }
 
-// ----------------------------------------------------------------------
 // Тесты для BitSequence
-// ----------------------------------------------------------------------
+
 void testBitSequenceConstruction()
 {
     cout << "  Проверка конструкторов и Get" << endl;
@@ -543,9 +531,8 @@ void testBitSequence()
     testBitSequenceConcat();
     testBitSequenceBitwiseOperations();
 }
-// ----------------------------------------------------------------------
 // Тесты для map и reduce (на примере MutableArraySequence)
-// ----------------------------------------------------------------------
+
 void testMapReduce()
 {
     cout << "  Проверка map и reduce (MutableArraySequence<int>)" << endl;
@@ -572,10 +559,7 @@ void testMapReduce()
     delete mapped;
     cout << "    OK" << endl;
 }
-
-// ----------------------------------------------------------------------
 // Тесты для computeStats (min, max, avg)
-// ----------------------------------------------------------------------
 void testComputeStats()
 {
     cout << "  Проверка computeStats (min, max, avg)" << endl;
@@ -596,15 +580,12 @@ void testComputeStats()
         assert(s.min == 0 && s.max == 0 && s.sum == 0.0 && s.count == 0);
         cout << "    Пустая последовательность обработана корректно" << endl;
     } catch (const exception& e) {
-        // Или можно ожидать исключение – зависит от вашей реализации
         cout << "    Пустая последовательность: " << e.what() << endl;
     }
     cout << "    OK" << endl;
 }
 
-// ----------------------------------------------------------------------
 // Тесты для медианы
-// ----------------------------------------------------------------------
 void testMedian()
 {
     cout << "  Проверка median (нечетное количество)" << endl;
@@ -627,10 +608,6 @@ void testMedian()
 }
 
 
-
-// ----------------------------------------------------------------------
-// Главная функция
-// ----------------------------------------------------------------------
 int main()
 {
     try

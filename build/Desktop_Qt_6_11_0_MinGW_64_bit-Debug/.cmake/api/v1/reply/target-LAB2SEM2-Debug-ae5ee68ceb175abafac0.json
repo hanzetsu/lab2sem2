@@ -75,7 +75,7 @@
 			{
 				"command" : 4,
 				"file" : 1,
-				"line" : 34,
+				"line" : 36,
 				"parent" : 0
 			},
 			{
@@ -345,11 +345,11 @@
 	"dependencies" : 
 	[
 		{
-			"backtrace" : 0,
-			"id" : "LAB2SEM2_autogen::@6890427a1f51a3e7e1df"
+			"id" : "LAB2SEM2_autogen_timestamp_deps::@6890427a1f51a3e7e1df"
 		},
 		{
-			"id" : "LAB2SEM2_autogen_timestamp_deps::@6890427a1f51a3e7e1df"
+			"backtrace" : 0,
+			"id" : "LAB2SEM2_autogen::@6890427a1f51a3e7e1df"
 		}
 	],
 	"id" : "LAB2SEM2::@6890427a1f51a3e7e1df",
@@ -449,7 +449,9 @@
 				11,
 				12,
 				13,
-				14
+				14,
+				15,
+				16
 			]
 		},
 		{
@@ -463,14 +465,14 @@
 			"name" : "",
 			"sourceIndexes" : 
 			[
-				15
+				17
 			]
 		},
 		{
 			"name" : "CMake Rules",
 			"sourceIndexes" : 
 			[
-				16
+				18
 			]
 		}
 	],
@@ -548,6 +550,16 @@
 		{
 			"backtrace" : 4,
 			"path" : "Sequence.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "SequenceBuilder.hpp",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "SequenceAlgorithms.hpp",
 			"sourceGroupIndex" : 1
 		},
 		{
