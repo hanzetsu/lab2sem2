@@ -37,17 +37,16 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    // Последовательности для разных типов (активна только одна)
     Sequence<int>* currentIntSequence;
     Sequence<double>* currentDoubleSequence;
     Sequence<QString>* currentStringSequence;
     BitSequence* currentBitSequence;
 
     int currentSeqType;     // 0=MutableArray,1=MutableList,2=ImmutableArray,3=ImmutableList,4=Bit
-    int currentDataType;    // 0=int,1=double,2=QString (актуально только если не Bit)
-    bool isBitMode;         // true, если выбрана BitSequence
+    int currentDataType;    // 0=int,1=double,2=QString
+    bool isBitMode;         
 
     void deleteCurrentSequences();
-    void createNewSequence();   // создаёт последовательность согласно currentSeqType и currentDataType
+    void createNewSequence(); 
 };
 

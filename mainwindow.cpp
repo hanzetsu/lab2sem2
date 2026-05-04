@@ -14,24 +14,22 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Заполняем комбобокс типами последовательностей
+    
     ui->typeComboBox->addItem("MutableArraySequence");
     ui->typeComboBox->addItem("MutableListSequence");
     ui->typeComboBox->addItem("ImmutableArraySequence");
     ui->typeComboBox->addItem("ImmutableListSequence");
     ui->typeComboBox->addItem("BitSequence");
 
-    // Заполняем комбобокс типами данных (активен только когда не Bit)
+    
     ui->dataTypeComboBox->addItem("int");
     ui->dataTypeComboBox->addItem("double");
     ui->dataTypeComboBox->addItem("QString");
 
-    // Устанавливаем начальный тип
     currentSeqType = 0;
     currentDataType = 0;
     createNewSequence();
 
-    // Для битовой последовательности скрываем dataTypeComboBox
     ui->dataTypeComboBox->setEnabled(!isBitMode);
     on_typeComboBox_currentIndexChanged(0);
 }
@@ -117,7 +115,6 @@ void MainWindow::updateDisplay()
         return;
     }
 
-    // Отображение для обычных типов
     if (currentIntSequence && currentDataType == 0) {
         int len = currentIntSequence->GetLength();
         ui->statusLabel->setText(QString("Длина: %1").arg(len));
@@ -382,7 +379,6 @@ void MainWindow::on_clearButton_clicked()
         currentBitSequence = new BitSequence();
     }
     else {
-        // Проще пересоздать последовательность
         createNewSequence();
     }
     updateDisplay();

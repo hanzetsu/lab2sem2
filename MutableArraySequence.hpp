@@ -101,22 +101,26 @@ public:
             result->data->Set(thisLen + i, list->Get(i));
         return result;
     }
-template <typename U, typename Func>
-MutableArraySequence<U>* map(Func f) const {
-    int len = this->GetLength();
-    MutableArraySequence<U>* result = new MutableArraySequence<U>(len);
-    for (int i = 0; i < len; ++i) {
-        result->Set(i, f(this->Get(i)));
+    template <typename U, typename Func>
+    MutableArraySequence<U> *map(Func f) const
+    {
+        int len = this->GetLength();
+        MutableArraySequence<U> *result = new MutableArraySequence<U>(len);
+        for (int i = 0; i < len; ++i)
+        {
+            result->Set(i, f(this->Get(i)));
+        }
+        return result;
     }
-    return result;
-}
 
-template <typename U, typename Func>
-U reduce(Func f, U init) const {
-    U acc = init;
-    for (int i = 0; i < this->GetLength(); ++i) {
-        acc = f(acc, this->Get(i));
+    template <typename U, typename Func>
+    U reduce(Func f, U init) const
+    {
+        U acc = init;
+        for (int i = 0; i < this->GetLength(); ++i)
+        {
+            acc = f(acc, this->Get(i));
+        }
+        return acc;
     }
-    return acc;
-}
 };

@@ -2,7 +2,7 @@
 #include "DynamicArray.hpp"
 #include "Sequence.hpp"
 #include <stdexcept>
-#include <limits> 
+#include <limits>
 
 struct Stats
 {
@@ -16,15 +16,16 @@ template <typename T>
 Stats computeStats(const Sequence<T> &seq)
 {
     int n = seq.GetLength();
-    if (n == 0) {
-    
+    if (n == 0)
         return {0, 0, 0.0, 0};
-    }
     Stats res = {seq.Get(0), seq.Get(0), 0.0, 0};
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; ++i)
+    {
         T val = seq.Get(i);
-        if (val < res.min) res.min = val;
-        if (val > res.max) res.max = val;
+        if (val < res.min)
+            res.min = val;
+        if (val > res.max)
+            res.max = val;
         res.sum += val;
         res.count++;
     }
