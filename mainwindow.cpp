@@ -162,7 +162,6 @@ void MainWindow::on_appendButton_clicked()
                 bool ok;
                 int val = text.toInt(&ok);
                 if (!ok) throw std::invalid_argument("Не целое число");
-                // mutable/immutable логика
                 MutableArraySequence<int>* mArr = dynamic_cast<MutableArraySequence<int>*>(currentIntSequence);
                 MutableListSequence<int>* mList = dynamic_cast<MutableListSequence<int>*>(currentIntSequence);
                 if (mArr) mArr->Append(val);

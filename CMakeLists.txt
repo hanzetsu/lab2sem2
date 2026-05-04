@@ -26,7 +26,6 @@ qt_add_executable(LAB2SEM2
     MutableArraySequence.hpp
     MutableListSequence.hpp
     Sequence.hpp
-    SequenceBuilder.hpp
     SequenceAlgorithms.hpp
     mainwindow.ui
 )
