@@ -9,8 +9,8 @@ private:
     DynamicArray<T> *data;
 
 public:
-    MutableArraySequence(T *items, int count) : data(new DynamicArray<T>(items, count)) {}
-    MutableArraySequence(int size) : data(new DynamicArray<T>(size)) {}
+    MutableArraySequence(T *items, std::size_t count) : data(new DynamicArray<T>(items, count)) {}
+    MutableArraySequence(std::size_t size) : data(new DynamicArray<T>(size)) {}
     MutableArraySequence(const MutableArraySequence &other) : data(new DynamicArray<T>(*other.data)) {}
     ~MutableArraySequence() { delete data; }
     MutableArraySequence() : data(new DynamicArray<T>(0)) {}
@@ -24,39 +24,39 @@ public:
 
     T GetLast() const override
     {
-        int len = GetLength();
+        std::size_t len = GetLength();
         if (len == 0)
             throw std::out_of_range("Последовательность пуста");
         return data->Get(len - 1);
     }
 
-    T Get(int index) const override
+    T Get(std::size_t index) const override
     {
         return data->Get(index);
     }
 
-    int GetLength() const override
+    std::size_t GetLength() const override
     {
         return data->GetSize();
     }
 
-    void Set(int index, T value) { data->Set(index, value); }
-    void Resize(int newSize) { data->Resize(newSize); }
+    void Set(std::size_t index, T value) { data->Set(index, value); }
+    void Resize(std::size_t newSize) { data->Resize(newSize); }
 
-    Sequence<T> *GetSubsequence(int startIndex, int endIndex) const override
+    Sequence<T> *GetSubsequence(std::size_t startIndex, std::size_t endIndex) const override
     {
-        if (startIndex < 0 || endIndex >= GetLength() || startIndex > endIndex)
+        if (startIndex > endIndex || endIndex >= GetLength())
             throw std::out_of_range("Неверные индексы подпоследовательности");
-        int newSize = endIndex - startIndex + 1;
+        std::size_t newSize = endIndex - startIndex + 1;
         MutableArraySequence<T> *sub = new MutableArraySequence<T>(newSize);
-        for (int i = 0; i < newSize; ++i)
+        for (std::size_t i = 0; i < newSize; ++i)
             sub->data->Set(i, data->Get(startIndex + i));
         return sub;
     }
 
     Sequence<T> *Append(T item) override
     {
-        int oldSize = GetLength();
+        std::size_t oldSize = GetLength();
         data->Resize(oldSize + 1);
         data->Set(oldSize, item);
         return this;
@@ -64,26 +64,26 @@ public:
 
     Sequence<T> *Prepend(T item) override
     {
-        int oldSize = GetLength();
+        std::size_t oldSize = GetLength();
         DynamicArray<T> *newData = new DynamicArray<T>(oldSize + 1);
         newData->Set(0, item);
-        for (int i = 0; i < oldSize; ++i)
+        for (std::size_t i = 0; i < oldSize; ++i)
             newData->Set(i + 1, data->Get(i));
         delete data;
         data = newData;
         return this;
     }
 
-    Sequence<T> *InsertAt(T item, int index) override
+    Sequence<T> *InsertAt(T item, std::size_t index) override
     {
-        int len = GetLength();
-        if (index < 0 || index > len)
+        std::size_t len = GetLength();
+        if (index > len)
             throw std::out_of_range("Неверный индекс вставки");
         DynamicArray<T> *newData = new DynamicArray<T>(len + 1);
-        for (int i = 0; i < index; ++i)
+        for (std::size_t i = 0; i < index; ++i)
             newData->Set(i, data->Get(i));
         newData->Set(index, item);
-        for (int i = index; i < len; ++i)
+        for (std::size_t i = index; i < len; ++i)
             newData->Set(i + 1, data->Get(i));
         delete data;
         data = newData;
@@ -92,21 +92,22 @@ public:
 
     Sequence<T> *Concat(Sequence<T> *list) const override
     {
-        int thisLen = GetLength();
-        int otherLen = list->GetLength();
+        std::size_t thisLen = GetLength();
+        std::size_t otherLen = list->GetLength();
         MutableArraySequence<T> *result = new MutableArraySequence<T>(thisLen + otherLen);
-        for (int i = 0; i < thisLen; ++i)
+        for (std::size_t i = 0; i < thisLen; ++i)
             result->data->Set(i, data->Get(i));
-        for (int i = 0; i < otherLen; ++i)
+        for (std::size_t i = 0; i < otherLen; ++i)
             result->data->Set(thisLen + i, list->Get(i));
         return result;
     }
+
     template <typename U, typename Func>
     MutableArraySequence<U> *map(Func f) const
     {
-        int len = this->GetLength();
+        std::size_t len = this->GetLength();
         MutableArraySequence<U> *result = new MutableArraySequence<U>(len);
-        for (int i = 0; i < len; ++i)
+        for (std::size_t i = 0; i < len; ++i)
         {
             result->Set(i, f(this->Get(i)));
         }
@@ -117,7 +118,7 @@ public:
     U reduce(Func f, U init) const
     {
         U acc = init;
-        for (int i = 0; i < this->GetLength(); ++i)
+        for (std::size_t i = 0; i < this->GetLength(); ++i)
         {
             acc = f(acc, this->Get(i));
         }

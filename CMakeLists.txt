@@ -14,13 +14,7 @@ if(NOT Qt6_FOUND)
     find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
 endif()
 
-set(SOURCES
-    source/main.cpp
-    source/mainwindow.cpp
-)
-
-set(HEADERS
-    include/mainwindow.hpp
+set(HEADERS_COMMON
     include/Bit.hpp
     include/BitSequence.hpp
     include/DynamicArray.hpp
@@ -33,14 +27,23 @@ set(HEADERS
     include/SequenceAlgorithms.hpp
 )
 
+set(HEADERS_GUI
+    include/mainwindow.hpp
+)
+
+set(SOURCES_GUI
+    source/main.cpp
+    source/mainwindow.cpp
+)
 
 set(UI_FILES
     source/mainwindow.ui
 )
 
 qt_add_executable(LAB2SEM2
-    ${SOURCES}
-    ${HEADERS}
+    ${SOURCES_GUI}
+    ${HEADERS_COMMON}
+    ${HEADERS_GUI}
     ${UI_FILES}
 )
 
@@ -50,4 +53,17 @@ if(Qt6_FOUND)
     target_link_libraries(LAB2SEM2 PRIVATE Qt6::Core Qt6::Widgets)
 else()
     target_link_libraries(LAB2SEM2 PRIVATE Qt5::Core Qt5::Widgets)
+endif()
+
+qt_add_executable(tests
+    source/test.cpp
+    ${HEADERS_COMMON}          
+)
+
+target_include_directories(tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+if(Qt6_FOUND)
+    target_link_libraries(tests PRIVATE Qt6::Core)
+else()
+    target_link_libraries(tests PRIVATE Qt5::Core)
 endif()

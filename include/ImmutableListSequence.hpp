@@ -9,7 +9,7 @@ private:
     LinkedList<T> *list;
 
 public:
-    ImmutableListSequence(T *items, int count) : list(new LinkedList<T>(items, count)) {}
+    ImmutableListSequence(T *items, std::size_t count) : list(new LinkedList<T>(items, count)) {}
     ImmutableListSequence() : list(new LinkedList<T>()) {}
     ImmutableListSequence(const ImmutableListSequence &other) : list(new LinkedList<T>(*other.list)) {}
     ImmutableListSequence(LinkedList<T> *lst) : list(lst) {}
@@ -33,17 +33,17 @@ public:
         return list->GetLast();
     }
 
-    T Get(int index) const override
+    T Get(std::size_t index) const override
     {
         return list->Get(index);
     }
 
-    int GetLength() const override
+    std::size_t GetLength() const override
     {
         return list->GetLength();
     }
 
-    Sequence<T> *GetSubsequence(int startIndex, int endIndex) const override
+    Sequence<T> *GetSubsequence(std::size_t startIndex, std::size_t endIndex) const override
     {
         LinkedList<T> *subList = list->GetSubList(startIndex, endIndex);
         return new ImmutableListSequence<T>(subList);
@@ -63,7 +63,7 @@ public:
         return newSeq;
     }
 
-    Sequence<T> *InsertAt(T item, int index) override
+    Sequence<T> *InsertAt(T item, std::size_t index) override
     {
         ImmutableListSequence<T> *newSeq = new ImmutableListSequence<T>(*this);
         newSeq->list->InsertAt(item, index);

@@ -3,23 +3,24 @@
 #include "Sequence.hpp"
 #include <stdexcept>
 #include <limits>
+#include <cstddef>
 
 struct Stats
 {
     int min;
     int max;
     double sum;
-    int count;
+    std::size_t count;
 };
 
 template <typename T>
 Stats computeStats(const Sequence<T> &seq)
 {
-    int n = seq.GetLength();
+    std::size_t n = seq.GetLength();
     if (n == 0)
         return {0, 0, 0.0, 0};
     Stats res = {seq.Get(0), seq.Get(0), 0.0, 0};
-    for (int i = 0; i < n; ++i)
+    for (std::size_t i = 0; i < n; ++i)
     {
         T val = seq.Get(i);
         if (val < res.min)
@@ -33,12 +34,12 @@ Stats computeStats(const Sequence<T> &seq)
 }
 
 template <typename T>
-void quickSort(DynamicArray<T> &arr, int left, int right)
+void quickSort(DynamicArray<T> &arr, std::size_t left, std::size_t right)
 {
     if (left >= right)
         return;
     T pivot = arr.Get((left + right) / 2);
-    int i = left, j = right;
+    std::size_t i = left, j = right;
     while (i <= j)
     {
         while (arr.Get(i) < pivot)
@@ -61,18 +62,19 @@ void quickSort(DynamicArray<T> &arr, int left, int right)
 template <typename T>
 void sortDynamicArray(DynamicArray<T> &arr)
 {
-    quickSort(arr, 0, arr.GetSize() - 1);
+    if (arr.GetSize() > 0)
+        quickSort(arr, 0, arr.GetSize() - 1);
 }
 
 template <typename T>
 double median(const Sequence<T> &seq)
 {
-    int n = seq.GetLength();
+    std::size_t n = seq.GetLength();
     if (n == 0)
         throw std::runtime_error("Пустая последовательность: невозможно вычислить медиану");
 
     DynamicArray<T> copy(n);
-    for (int i = 0; i < n; ++i)
+    for (std::size_t i = 0; i < n; ++i)
     {
         copy.Set(i, seq.Get(i));
     }

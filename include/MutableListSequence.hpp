@@ -9,7 +9,7 @@ private:
     LinkedList<T> *list;
 
 public:
-    MutableListSequence(T *items, int count) : list(new LinkedList<T>(items, count)) {}
+    MutableListSequence(T *items, std::size_t count) : list(new LinkedList<T>(items, count)) {}
     MutableListSequence() : list(new LinkedList<T>()) {}
     MutableListSequence(const MutableListSequence &other) : list(new LinkedList<T>(*other.list)) {}
 
@@ -32,17 +32,17 @@ public:
         return list->GetLast();
     }
 
-    T Get(int index) const override
+    T Get(std::size_t index) const override
     {
         return list->Get(index);
     }
 
-    int GetLength() const override
+    std::size_t GetLength() const override
     {
         return list->GetLength();
     }
 
-    Sequence<T> *GetSubsequence(int startIndex, int endIndex) const override
+    Sequence<T> *GetSubsequence(std::size_t startIndex, std::size_t endIndex) const override
     {
         LinkedList<T> *subList = list->GetSubList(startIndex, endIndex);
         MutableListSequence<T> *result = new MutableListSequence<T>();
@@ -63,7 +63,7 @@ public:
         return this;
     }
 
-    Sequence<T> *InsertAt(T item, int index) override
+    Sequence<T> *InsertAt(T item, std::size_t index) override
     {
         list->InsertAt(item, index);
         return this;
@@ -78,12 +78,13 @@ public:
         result->list->Concat(*other->list);
         return result;
     }
+
     template <typename U, typename Func>
     MutableListSequence<U> *map(Func f) const
     {
-        int len = this->GetLength();
+        std::size_t len = this->GetLength();
         MutableListSequence<U> *result = new MutableListSequence<U>();
-        for (int i = 0; i < len; ++i)
+        for (std::size_t i = 0; i < len; ++i)
         {
             result->Append(f(this->Get(i)));
         }
@@ -94,7 +95,7 @@ public:
     U reduce(Func f, U init) const
     {
         U acc = init;
-        for (int i = 0; i < this->GetLength(); ++i)
+        for (std::size_t i = 0; i < this->GetLength(); ++i)
         {
             acc = f(acc, this->Get(i));
         }

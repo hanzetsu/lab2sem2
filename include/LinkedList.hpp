@@ -1,5 +1,6 @@
 #pragma once
 #include <stdexcept>
+#include <cstddef>
 
 template <typename T>
 class Node
@@ -18,12 +19,12 @@ template <typename T>
 class LinkedList
 {
 private:
-    int size;
+    std::size_t size;
     Node<T> *head;
     Node<T> *tail;
 
 public:
-    LinkedList(T *items, int count);
+    LinkedList(T *items, std::size_t count);
     LinkedList() : head(nullptr), tail(nullptr), size(0) {};
     LinkedList(const LinkedList<T> &list);
     ~LinkedList()
@@ -48,30 +49,30 @@ public:
             throw std::out_of_range("Нет элементов");
         return tail->data;
     };
-    T Get(int index);
-    LinkedList<T> *GetSubList(int startIndex, int endIndex);
-    int GetLength() { return size; }
+    T Get(std::size_t index);
+    LinkedList<T> *GetSubList(std::size_t startIndex, std::size_t endIndex);
+    std::size_t GetLength() { return size; }
     void Append(T item);
     void Prepend(T item);
-    void InsertAt(T item, int index);
+    void InsertAt(T item, std::size_t index);
     void Concat(LinkedList<T> &list);
 };
 
 template <typename T>
-T LinkedList<T>::Get(int index)
+T LinkedList<T>::Get(std::size_t index)
 {
-    if (index < 0 || index >= size)
+    if (index >= size)
         throw std::out_of_range("Индекс вне диапазона");
     Node<T> *temp = head;
-    for (int i = 0; i < index; i++)
+    for (std::size_t i = 0; i < index; i++)
         temp = temp->next;
     return temp->data;
 }
 
 template <typename T>
-LinkedList<T>::LinkedList(T *items, int count) : head(nullptr), tail(nullptr), size(0)
+LinkedList<T>::LinkedList(T *items, std::size_t count) : head(nullptr), tail(nullptr), size(0)
 {
-    for (int i = 0; i < count; ++i)
+    for (std::size_t i = 0; i < count; ++i)
     {
         Node<T> *newNode = new Node<T>(items[i]);
         if (!head)
@@ -98,15 +99,15 @@ LinkedList<T>::LinkedList(const LinkedList<T> &list) : LinkedList()
 }
 
 template <typename T>
-LinkedList<T> *LinkedList<T>::GetSubList(int startIndex, int endIndex)
+LinkedList<T> *LinkedList<T>::GetSubList(std::size_t startIndex, std::size_t endIndex)
 {
-    if (startIndex < 0 || endIndex >= size || startIndex > endIndex)
+    if (startIndex > endIndex || endIndex >= size)
         throw std::out_of_range("Неверные индексы подсписка");
     LinkedList<T> *newList = new LinkedList<T>();
     Node<T> *tmp = head;
-    for (int i = 0; i < startIndex; i++)
+    for (std::size_t i = 0; i < startIndex; i++)
         tmp = tmp->next;
-    for (int i = startIndex; i <= endIndex; i++)
+    for (std::size_t i = startIndex; i <= endIndex; i++)
     {
         newList->Append(tmp->data);
         tmp = tmp->next;
@@ -145,9 +146,9 @@ void LinkedList<T>::Prepend(T item)
 }
 
 template <typename T>
-void LinkedList<T>::InsertAt(T item, int index)
+void LinkedList<T>::InsertAt(T item, std::size_t index)
 {
-    if (index < 0 || index > size)
+    if (index > size)
         throw std::out_of_range("Неверный индекс вставки");
     if (index == 0)
     {
@@ -160,7 +161,7 @@ void LinkedList<T>::InsertAt(T item, int index)
         return;
     }
     Node<T> *current = head;
-    for (int i = 0; i < index; i++)
+    for (std::size_t i = 0; i < index; i++)
         current = current->next;
     Node<T> *newNode = new Node<T>(item);
     newNode->next = current;

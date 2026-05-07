@@ -4,44 +4,45 @@
 #include "Bit.hpp"
 #include <cstdint>
 #include <stdexcept>
+#include <cstddef>
 
 class BitSequence : public Sequence<Bit>
 {
 private:
     DynamicArray<uint8_t> *bytes;
-    int bitLength;
+    std::size_t bitLength;
 
-    static int byteIndex(int bitIndex) noexcept { return bitIndex / 8; }    
-    static int bitOffset(int bitIndex) noexcept { return bitIndex % 8; }
+    static std::size_t byteIndex(std::size_t bitIndex) noexcept { return bitIndex / 8; }
+    static int bitOffset(std::size_t bitIndex) noexcept { return static_cast<int>(bitIndex % 8); }
     static uint8_t mask(int offset) noexcept { return 1 << offset; }
 
-    // Внутренний конструктор для создания из существующего массива байт
-    BitSequence(DynamicArray<uint8_t> *arr, int length) : bytes(arr), bitLength(length) {}
+    BitSequence(DynamicArray<uint8_t> *arr, std::size_t length) : bytes(arr), bitLength(length) {}
 
 public:
     BitSequence() : bytes(new DynamicArray<uint8_t>(0)), bitLength(0) {}
 
-    BitSequence(int size, Bit initialValue = Bit::zero)
+    BitSequence(std::size_t size, Bit initialValue = Bit::zero)
         : bytes(new DynamicArray<uint8_t>((size + 7) / 8)), bitLength(size)
     {
         uint8_t fill = (initialValue == Bit::one) ? 0xFF : 0x00;
-        for (int i = 0; i < bytes->GetSize(); ++i)
+        for (std::size_t i = 0; i < bytes->GetSize(); ++i)
             bytes->Set(i, fill);
         if (size % 8 != 0 && initialValue == Bit::one)
         {
-            int lastIdx = bytes->GetSize() - 1;
+            std::size_t lastIdx = bytes->GetSize() - 1;
             uint8_t lastByte = bytes->Get(lastIdx);
             lastByte &= (1 << (size % 8)) - 1;
             bytes->Set(lastIdx, lastByte);
         }
     }
 
-    BitSequence(const Bit *bits, int count) : BitSequence(count)
+    BitSequence(const Bit *bits, std::size_t count) : BitSequence(count)
     {
-        for (int i = 0; i < count; ++i)
+        for (std::size_t i = 0; i < count; ++i)
             if (bits[i] == Bit::one)
             {
-                int idx = byteIndex(i), off = bitOffset(i);
+                std::size_t idx = byteIndex(i);
+                int off = bitOffset(i);
                 uint8_t b = bytes->Get(idx);
                 b |= mask(off);
                 bytes->Set(idx, b);
@@ -78,29 +79,29 @@ public:
         return Get(bitLength - 1);
     }
 
-    Bit Get(int index) const override
+    Bit Get(std::size_t index) const override
     {
-        if (index < 0 || index >= bitLength)
+        if (index >= bitLength)
             throw std::out_of_range("Индекс вне диапазона");
-        int byteIdx = byteIndex(index);
+        std::size_t byteIdx = byteIndex(index);
         int bitOff = bitOffset(index);
         uint8_t byte = bytes->Get(byteIdx);
         return (byte & mask(bitOff)) ? Bit::one : Bit::zero;
     }
 
-    int GetLength() const override { return bitLength; }
+    std::size_t GetLength() const override { return bitLength; }
 
-    Sequence<Bit> *GetSubsequence(int startIndex, int endIndex) const override
+    Sequence<Bit> *GetSubsequence(std::size_t startIndex, std::size_t endIndex) const override
     {
-        if (startIndex < 0 || endIndex >= bitLength || startIndex > endIndex)
+        if (startIndex > endIndex || endIndex >= bitLength)
             throw std::out_of_range("Неверные индексы подпоследовательности");
-        int newSize = endIndex - startIndex + 1;
+        std::size_t newSize = endIndex - startIndex + 1;
         BitSequence *sub = new BitSequence(newSize);
-        for (int i = 0; i < newSize; ++i)
+        for (std::size_t i = 0; i < newSize; ++i)
         {
             if (Get(startIndex + i) == Bit::one)
             {
-                int byteIdx = byteIndex(i);
+                std::size_t byteIdx = byteIndex(i);
                 int bitOff = bitOffset(i);
                 uint8_t b = sub->bytes->Get(byteIdx);
                 b |= mask(bitOff);
@@ -110,16 +111,16 @@ public:
         return sub;
     }
 
-    // Immutable методы (не меняют текущий объект)
+    // Immutable методы
     Sequence<Bit> *Append(Bit item) override
     {
         BitSequence *newSeq = new BitSequence(*this);
-        int idx = newSeq->bitLength;
-        int byteIdx = byteIndex(idx);
+        std::size_t idx = newSeq->bitLength;
+        std::size_t byteIdx = byteIndex(idx);
         int bitOff = bitOffset(idx);
         if (bitOff == 0)
         {
-            int oldSize = newSeq->bytes->GetSize();
+            std::size_t oldSize = newSeq->bytes->GetSize();
             newSeq->bytes->Resize(oldSize + 1);
             newSeq->bytes->Set(oldSize, 0);
         }
@@ -134,19 +135,17 @@ public:
     Sequence<Bit> *Prepend(Bit item) override
     {
         BitSequence *newSeq = new BitSequence(bitLength + 1);
-        // Устанавливаем первый бит
         if (item == Bit::one)
         {
             uint8_t b = newSeq->bytes->Get(0);
             b |= mask(0);
             newSeq->bytes->Set(0, b);
         }
-        // Копируем старые биты со сдвигом
-        for (int i = 0; i < bitLength; ++i)
+        for (std::size_t i = 0; i < bitLength; ++i)
             if (Get(i) == Bit::one)
             {
-                int newIdx = i + 1;
-                int byteIdx = byteIndex(newIdx);
+                std::size_t newIdx = i + 1;
+                std::size_t byteIdx = byteIndex(newIdx);
                 int bitOff = bitOffset(newIdx);
                 uint8_t b = newSeq->bytes->Get(byteIdx);
                 b |= mask(bitOff);
@@ -155,36 +154,33 @@ public:
         return newSeq;
     }
 
-    Sequence<Bit> *InsertAt(Bit item, int index) override
+    Sequence<Bit> *InsertAt(Bit item, std::size_t index) override
     {
-        if (index < 0 || index > bitLength)
+        if (index > bitLength)
             throw std::out_of_range("Неверный индекс вставки");
         BitSequence *newSeq = new BitSequence(bitLength + 1);
-        // Копируем биты до index
-        for (int i = 0; i < index; ++i)
+        for (std::size_t i = 0; i < index; ++i)
             if (Get(i) == Bit::one)
             {
-                int byteIdx = byteIndex(i);
+                std::size_t byteIdx = byteIndex(i);
                 int bitOff = bitOffset(i);
                 uint8_t b = newSeq->bytes->Get(byteIdx);
                 b |= mask(bitOff);
                 newSeq->bytes->Set(byteIdx, b);
             }
-        // Вставляем item
         if (item == Bit::one)
         {
-            int byteIdx = byteIndex(index);
+            std::size_t byteIdx = byteIndex(index);
             int bitOff = bitOffset(index);
             uint8_t b = newSeq->bytes->Get(byteIdx);
             b |= mask(bitOff);
             newSeq->bytes->Set(byteIdx, b);
         }
-        // Копируем биты после index
-        for (int i = index; i < bitLength; ++i)
+        for (std::size_t i = index; i < bitLength; ++i)
             if (Get(i) == Bit::one)
             {
-                int newIdx = i + 1;
-                int byteIdx = byteIndex(newIdx);
+                std::size_t newIdx = i + 1;
+                std::size_t byteIdx = byteIndex(newIdx);
                 int bitOff = bitOffset(newIdx);
                 uint8_t b = newSeq->bytes->Get(byteIdx);
                 b |= mask(bitOff);
@@ -197,24 +193,22 @@ public:
     {
         if (!seq)
             throw std::invalid_argument("Пустой указатель на последовательность");
-        int otherLen = seq->GetLength();
+        std::size_t otherLen = seq->GetLength();
         BitSequence *result = new BitSequence(bitLength + otherLen);
-        // Копируем текущие биты
-        for (int i = 0; i < bitLength; ++i)
+        for (std::size_t i = 0; i < bitLength; ++i)
             if (Get(i) == Bit::one)
             {
-                int byteIdx = byteIndex(i);
+                std::size_t byteIdx = byteIndex(i);
                 int bitOff = bitOffset(i);
                 uint8_t b = result->bytes->Get(byteIdx);
                 b |= mask(bitOff);
                 result->bytes->Set(byteIdx, b);
             }
-        // Копируем биты из seq
-        for (int i = 0; i < otherLen; ++i)
+        for (std::size_t i = 0; i < otherLen; ++i)
             if (seq->Get(i) == Bit::one)
             {
-                int idx = bitLength + i;
-                int byteIdx = byteIndex(idx);
+                std::size_t idx = bitLength + i;
+                std::size_t byteIdx = byteIndex(idx);
                 int bitOff = bitOffset(idx);
                 uint8_t b = result->bytes->Get(byteIdx);
                 b |= mask(bitOff);
@@ -229,12 +223,12 @@ public:
         if (bitLength != other.bitLength)
             throw std::invalid_argument("Длины последовательностей не совпадают");
         BitSequence *res = new BitSequence(bitLength);
-        int numBytes = bytes->GetSize();
-        for (int i = 0; i < numBytes; ++i)
+        std::size_t numBytes = bytes->GetSize();
+        for (std::size_t i = 0; i < numBytes; ++i)
             res->bytes->Set(i, bytes->Get(i) & other.bytes->Get(i));
         if (bitLength % 8 != 0)
         {
-            int lastIdx = numBytes - 1;
+            std::size_t lastIdx = numBytes - 1;
             uint8_t lastByte = res->bytes->Get(lastIdx);
             lastByte &= (1 << (bitLength % 8)) - 1;
             res->bytes->Set(lastIdx, lastByte);
@@ -247,12 +241,12 @@ public:
         if (bitLength != other.bitLength)
             throw std::invalid_argument("Длины последовательностей не совпадают");
         BitSequence *res = new BitSequence(bitLength);
-        int numBytes = bytes->GetSize();
-        for (int i = 0; i < numBytes; ++i)
+        std::size_t numBytes = bytes->GetSize();
+        for (std::size_t i = 0; i < numBytes; ++i)
             res->bytes->Set(i, bytes->Get(i) | other.bytes->Get(i));
         if (bitLength % 8 != 0)
         {
-            int lastIdx = numBytes - 1;
+            std::size_t lastIdx = numBytes - 1;
             uint8_t lastByte = res->bytes->Get(lastIdx);
             lastByte &= (1 << (bitLength % 8)) - 1;
             res->bytes->Set(lastIdx, lastByte);
@@ -265,12 +259,12 @@ public:
         if (bitLength != other.bitLength)
             throw std::invalid_argument("Длины последовательностей не совпадают");
         BitSequence *res = new BitSequence(bitLength);
-        int numBytes = bytes->GetSize();
-        for (int i = 0; i < numBytes; ++i)
+        std::size_t numBytes = bytes->GetSize();
+        for (std::size_t i = 0; i < numBytes; ++i)
             res->bytes->Set(i, bytes->Get(i) ^ other.bytes->Get(i));
         if (bitLength % 8 != 0)
         {
-            int lastIdx = numBytes - 1;
+            std::size_t lastIdx = numBytes - 1;
             uint8_t lastByte = res->bytes->Get(lastIdx);
             lastByte &= (1 << (bitLength % 8)) - 1;
             res->bytes->Set(lastIdx, lastByte);
@@ -281,12 +275,12 @@ public:
     BitSequence *Not() const
     {
         BitSequence *res = new BitSequence(bitLength);
-        int numBytes = bytes->GetSize();
-        for (int i = 0; i < numBytes; ++i)
+        std::size_t numBytes = bytes->GetSize();
+        for (std::size_t i = 0; i < numBytes; ++i)
             res->bytes->Set(i, ~bytes->Get(i));
         if (bitLength % 8 != 0)
         {
-            int lastIdx = numBytes - 1;
+            std::size_t lastIdx = numBytes - 1;
             uint8_t lastByte = res->bytes->Get(lastIdx);
             lastByte &= (1 << (bitLength % 8)) - 1;
             res->bytes->Set(lastIdx, lastByte);

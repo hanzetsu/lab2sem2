@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 19.0.1, 2026-05-06T12:41:05. -->
+<!-- Written by QtCreator 19.0.1, 2026-05-07T19:34:08. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -86,9 +86,6 @@
     <valuelist type="QVariantList" key="ClangTools.SuppressedDiagnostics"/>
     <value type="bool" key="ClangTools.UseGlobalSettings">true</value>
    </valuemap>
-   <valuemap type="QVariantMap" key="PESettingsAspect">
-    <value type="bool" key="PESettingsAspect.UseGlobalSettings">false</value>
-   </valuemap>
    <value type="int" key="RcSync">0</value>
   </valuemap>
  </data>
@@ -125,7 +122,7 @@
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="QString" key="CMakeProjectManager.MakeStep.BuildPreset"></value>
       <valuelist type="QVariantList" key="CMakeProjectManager.MakeStep.BuildTargets">
-       <value type="QString">all</value>
+       <value type="QString">LAB2SEM2</value>
       </valuelist>
       <value type="bool" key="CMakeProjectManager.MakeStep.ClearSystemEnvironment">false</value>
       <valuelist type="QVariantList" key="CMakeProjectManager.MakeStep.UserEnvironmentChanges"/>

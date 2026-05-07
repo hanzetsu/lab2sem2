@@ -13,7 +13,6 @@
 
 using namespace std;
 
-// Вспомогательные функции вывода
 template <typename T>
 void printSequence(Sequence<T>* seq, const string& title)
 {

@@ -1,90 +1,85 @@
 #pragma once
 
 #include <stdexcept>
+#include <cstddef>
 
 template <typename T>
 class DynamicArray
 {
 private:
     T *data;
-    int size;
+    std::size_t size;
 
 public:
-    DynamicArray(T *items, int count);
-    DynamicArray(int size);
+    DynamicArray(T *items, std::size_t count);
+    DynamicArray(std::size_t size);
     DynamicArray() : data(nullptr), size(0) {}
     DynamicArray(const DynamicArray<T> &other);
     ~DynamicArray()
     {
         delete[] data;
     };
-    T Get(int index) const;
-    int GetSize() const
+    T Get(std::size_t index) const;
+    std::size_t GetSize() const
     {
         return size;
     }
     T* GetRawData() const { return data; }
-    void Set(int index, T value);
-    void Resize(int newSize);
+    void Set(std::size_t index, T value);
+    void Resize(std::size_t newSize);
 };
+
 template <typename T>
-DynamicArray<T>::DynamicArray(int size)
+DynamicArray<T>::DynamicArray(std::size_t size)
 {
-    if (size < 0)
-        throw std::invalid_argument("Размер не может быть < 0");
     this->size = size;
     data = new T[size];
 };
+
 template <typename T>
-T DynamicArray<T>::Get(int index) const
+T DynamicArray<T>::Get(std::size_t index) const
 {
-    if (index >= 0 && index < size)
-        return data[index];
-    else
+    if (index >= size)
         throw std::out_of_range("Индекс вышел за границу");
+    return data[index];
 }
+
 template <typename T>
-void DynamicArray<T>::Set(int index, T value)
+void DynamicArray<T>::Set(std::size_t index, T value)
 {
-    if (index >= 0 && index < size)
-        data[index] = value;
-    else
+    if (index >= size)
         throw std::out_of_range("Индекс вышел за границу");
+    data[index] = value;
 }
+
 template <typename T>
-DynamicArray<T>::DynamicArray(T *items, int count)
+DynamicArray<T>::DynamicArray(T *items, std::size_t count)
 {
-    if (count < 0)
-        throw std::invalid_argument("Размер не может быть < 0");
-    else if (items == nullptr)
+    if (items == nullptr)
         throw std::invalid_argument("Нулевой указатель");
     size = count;
     data = new T[size];
-    for (int i = 0; i < count; i++)
+    for (std::size_t i = 0; i < count; i++)
     {
         data[i] = items[i];
     }
 }
 
 template <typename T>
-DynamicArray<T>::DynamicArray(const DynamicArray<T> &other) : size(other.size),  data(new T[size])
+DynamicArray<T>::DynamicArray(const DynamicArray<T> &other) : size(other.size), data(new T[size])
 {
-    for (int i = 0; i < size; i++)
+    for (std::size_t i = 0; i < size; i++)
     {
         data[i] = other.data[i];
     }
 }
 
 template <typename T>
-void DynamicArray<T>::Resize(int newSize)
+void DynamicArray<T>::Resize(std::size_t newSize)
 {
-    if (newSize < 0)
-    {
-        throw std::invalid_argument("Размер не может быть < 0");
-    }
     T *newData = new T[newSize];
-    int elementsToCopy = (newSize < size) ? newSize : size;
-    for (int i = 0; i < elementsToCopy; ++i)
+    std::size_t elementsToCopy = (newSize < size) ? newSize : size;
+    for (std::size_t i = 0; i < elementsToCopy; ++i)
     {
         newData[i] = data[i];
     }
