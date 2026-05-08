@@ -111,25 +111,22 @@ public:
         return sub;
     }
 
-    // Immutable методы
     Sequence<Bit> *Append(Bit item) override
     {
-        BitSequence *newSeq = new BitSequence(*this);
-        std::size_t idx = newSeq->bitLength;
+        std::size_t idx = bitLength;
         std::size_t byteIdx = byteIndex(idx);
         int bitOff = bitOffset(idx);
         if (bitOff == 0)
         {
-            std::size_t oldSize = newSeq->bytes->GetSize();
-            newSeq->bytes->Resize(oldSize + 1);
-            newSeq->bytes->Set(oldSize, 0);
+            bytes->Resize(bytes->GetSize() + 1);
+            bytes->Set(bytes->GetSize() - 1, 0);
         }
-        uint8_t b = newSeq->bytes->Get(byteIdx);
+        uint8_t b = bytes->Get(byteIdx);
         if (item == Bit::one)
             b |= mask(bitOff);
-        newSeq->bytes->Set(byteIdx, b);
-        newSeq->bitLength++;
-        return newSeq;
+        bytes->Set(byteIdx, b);
+        bitLength++;
+        return this;
     }
 
     Sequence<Bit> *Prepend(Bit item) override
