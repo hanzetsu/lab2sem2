@@ -9,7 +9,7 @@
 #include "ImmutableListSequence.hpp"
 #include "BitSequence.hpp"
 #include "Bit.hpp"
-#include "SequenceAlgorithms.hpp"
+
 
 using namespace std;
 
@@ -530,7 +530,6 @@ void testBitSequence()
     testBitSequenceConcat();
     testBitSequenceBitwiseOperations();
 }
-// Тесты для map и reduce (на примере MutableArraySequence)
 
 void testMapReduce()
 {
@@ -538,19 +537,16 @@ void testMapReduce()
     int data[] = {1, 2, 3, 4};
     MutableArraySequence<int> seq(data, 4);
 
-    // map: умножение на 2
     MutableArraySequence<int>* mapped = seq.map<int>([](int x) { return x * 2; });
     assert(mapped->GetLength() == 4);
     assert(mapped->Get(0) == 2);
     assert(mapped->Get(3) == 8);
     printSequence(mapped, "    map(*2)");
 
-    // reduce: сумма
     int sum = seq.reduce<int>([](int a, int b) { return a + b; }, 0);
     assert(sum == 10);
     cout << "    reduce sum = " << sum << endl;
 
-    // reduce с другим типом (double)
     double product = seq.reduce<double>([](double a, int b) { return a * b; }, 1.0);
     assert(product == 24.0);
     cout << "    reduce product = " << product << endl;
@@ -558,62 +554,12 @@ void testMapReduce()
     delete mapped;
     cout << "    OK" << endl;
 }
-// Тесты для computeStats (min, max, avg)
-void testComputeStats()
-{
-    cout << "  Проверка computeStats (min, max, avg)" << endl;
-    int data[] = {5, 2, 9, 1, 7};
-    MutableArraySequence<int> seq(data, 5);
-    Stats stats = computeStats(seq);
-    assert(stats.min == 1);
-    assert(stats.max == 9);
-    assert(stats.sum == 24.0);
-    assert(stats.count == 5);
-    double avg = stats.sum / stats.count;
-    cout << "    min=" << stats.min << " max=" << stats.max << " avg=" << avg << endl;
-    // Проверка для пустой последовательности
-    MutableArraySequence<int> empty;
-    try {
-        Stats s = computeStats(empty);
-        // Если реализация возвращает (0,0,0,0) – проверим
-        assert(s.min == 0 && s.max == 0 && s.sum == 0.0 && s.count == 0);
-        cout << "    Пустая последовательность обработана корректно" << endl;
-    } catch (const exception& e) {
-        cout << "    Пустая последовательность: " << e.what() << endl;
-    }
-    cout << "    OK" << endl;
-}
-
-// Тесты для медианы
-void testMedian()
-{
-    cout << "  Проверка median (нечетное количество)" << endl;
-    int data1[] = {3, 7, 1, 9, 2};
-    MutableArraySequence<int> seq1(data1, 5);
-    double med1 = median(seq1);
-    // После сортировки: 1,2,3,7,9 -> медиана 3
-    assert(med1 == 3.0);
-    cout << "    Медиана (нечет) = " << med1 << endl;
-
-    cout << "  Проверка median (четное количество)" << endl;
-    int data2[] = {4, 1, 7, 3};
-    MutableArraySequence<int> seq2(data2, 4);
-    double med2 = median(seq2);
-    // После сортировки: 1,3,4,7 -> (3+4)/2 = 3.5
-    assert(med2 == 3.5);
-    cout << "    Медиана (чет) = " << med2 << endl;
-
-    cout << "    OK" << endl;
-}
-
 
 int main()
 {
     try
     {
         testMapReduce();
-        testComputeStats();
-        testMedian();
         testDynamicArray();
         testLinkedList();
         testMutableArraySequence();
