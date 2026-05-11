@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>443</width>
-    <height>462</height>
+    <width>388</width>
+    <height>547</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>270</y>
+      <x>10</x>
+      <y>310</y>
       <width>160</width>
       <height>175</height>
      </rect>
@@ -64,9 +64,9 @@
    <widget class="QListWidget" name="listWidget">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>20</y>
-      <width>51</width>
+      <x>10</x>
+      <y>60</y>
+      <width>161</width>
       <height>241</height>
      </rect>
     </property>
@@ -74,8 +74,8 @@
    <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>310</y>
+      <x>190</x>
+      <y>370</y>
       <width>160</width>
       <height>112</height>
      </rect>
@@ -92,8 +92,8 @@
    <widget class="QLabel" name="statusLabel">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>0</y>
+      <x>10</x>
+      <y>30</y>
       <width>158</width>
       <height>16</height>
      </rect>
@@ -105,8 +105,8 @@
    <widget class="QComboBox" name="typeComboBox">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>10</y>
+      <x>190</x>
+      <y>80</y>
       <width>158</width>
       <height>22</height>
      </rect>
@@ -115,8 +115,8 @@
    <widget class="QComboBox" name="dataTypeComboBox">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>10</y>
+      <x>190</x>
+      <y>50</y>
       <width>62</width>
       <height>22</height>
      </rect>
@@ -128,8 +128,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>443</width>
-     <height>26</height>
+     <width>388</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>

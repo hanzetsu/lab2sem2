@@ -24,7 +24,6 @@ set(HEADERS_COMMON
     include/MutableArraySequence.hpp
     include/MutableListSequence.hpp
     include/Sequence.hpp
-    include/SequenceAlgorithms.hpp
 )
 
 set(HEADERS_GUI

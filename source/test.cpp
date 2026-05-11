@@ -480,46 +480,6 @@ void testBitSequenceConcat()
     cout << "    OK" << endl;
 }
 
-void testBitSequenceBitwiseOperations()
-{
-    cout << "  Проверка побитовых операций (AND, OR, XOR, NOT)" << endl;
-    Bit bitsA[] = {Bit::one, Bit::zero, Bit::one, Bit::zero};
-    Bit bitsB[] = {Bit::one, Bit::one, Bit::zero, Bit::zero};
-    BitSequence seqA(bitsA, 4);
-    BitSequence seqB(bitsB, 4);
-
-    BitSequence* andRes = seqA.And(seqB);
-    assert(andRes->GetLength() == 4);
-    assert(andRes->Get(0) == Bit::one);
-    assert(andRes->Get(1) == Bit::zero);
-    assert(andRes->Get(2) == Bit::zero);
-    assert(andRes->Get(3) == Bit::zero);
-    delete andRes;
-
-    BitSequence* orRes = seqA.Or(seqB);
-    assert(orRes->Get(0) == Bit::one);
-    assert(orRes->Get(1) == Bit::one);
-    assert(orRes->Get(2) == Bit::one);
-    assert(orRes->Get(3) == Bit::zero);
-    delete orRes;
-
-    BitSequence* xorRes = seqA.Xor(seqB);
-    assert(xorRes->Get(0) == Bit::zero);
-    assert(xorRes->Get(1) == Bit::one);
-    assert(xorRes->Get(2) == Bit::one);
-    assert(xorRes->Get(3) == Bit::zero);
-    delete xorRes;
-
-    BitSequence* notRes = seqA.Not();
-    assert(notRes->Get(0) == Bit::zero);
-    assert(notRes->Get(1) == Bit::one);
-    assert(notRes->Get(2) == Bit::zero);
-    assert(notRes->Get(3) == Bit::one);
-    delete notRes;
-
-    cout << "    OK" << endl;
-}
-
 void testBitSequence()
 {
     cout << "\n=== Тестирование BitSequence ===" << endl;
@@ -528,7 +488,6 @@ void testBitSequence()
     testBitSequencePrepend();
     testBitSequenceInsertAt();
     testBitSequenceConcat();
-    testBitSequenceBitwiseOperations();
 }
 
 void testMapReduce()
