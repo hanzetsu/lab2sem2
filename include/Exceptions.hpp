@@ -1,19 +1,24 @@
 #pragma once
 
-#include <stdexcept>
 #include <string>
+#include <sstream>
 
-class DataStructureException : public std::runtime_error
-{
+class IException {
 public:
-    explicit DataStructureException(const std::string &message)
-        : std::runtime_error(message) {}
+    virtual ~IException() = default;
+    virtual const char* what() const noexcept = 0;
 };
 
-class IndexOutOfRange : public DataStructureException
-{
+class DataStructureException : public IException {
+    std::string message;
 public:
-    IndexOutOfRange(std::size_t index, std::size_t size, const std::string &context)
+    explicit DataStructureException(const std::string& msg) : message(msg) {}
+    const char* what() const noexcept override { return message.c_str(); }
+};
+
+class IndexOutOfRange : public DataStructureException {
+public:
+    IndexOutOfRange(std::size_t index, std::size_t size, const std::string& context)
         : DataStructureException(buildMessage(index, size, context)),
           m_index(index), m_size(size) {}
 
@@ -21,31 +26,23 @@ public:
     std::size_t getSize() const noexcept { return m_size; }
 
 private:
-    static std::string buildMessage(std::size_t index, std::size_t size, const std::string &context)
-    {
-        if (size == 0)
-        {
-            return "Ошибка в " + context + ": индекс " + std::to_string(index) +
-                   " выходит за границы пустой последовательности";
-        }
-        return "Ошибка в " + context + ": индекс " + std::to_string(index) +
-               " вне допустимого диапазона [0, " + std::to_string(size - 1) + "]";
+    static std::string buildMessage(std::size_t index, std::size_t size, const std::string& context) {
+        std::ostringstream oss;
+        oss << "Ошибка в " << context << ": индекс " << index
+            << " вне допустимого диапазона [0, " << (size == 0 ? 0 : size - 1) << "]";
+        return oss.str();
     }
-
     std::size_t m_index;
     std::size_t m_size;
 };
 
-class EmptyStructureException : public DataStructureException
-{
+class EmptyStructureException : public DataStructureException {
 public:
-    explicit EmptyStructureException(const std::string &context)
+    explicit EmptyStructureException(const std::string& context)
         : DataStructureException("Ошибка в " + context + ": последовательность пуста") {}
 };
 
-class InvalidArgument : public DataStructureException
-{
+class InvalidArgument : public DataStructureException {
 public:
-    explicit InvalidArgument(const std::string &message)
-        : DataStructureException(message) {}
+    explicit InvalidArgument(const std::string& msg) : DataStructureException(msg) {}
 };
