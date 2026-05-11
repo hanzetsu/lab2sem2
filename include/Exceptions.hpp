@@ -3,7 +3,6 @@
 #include <stdexcept>
 #include <string>
 
-// Базовое исключение для всех ошибок структур данных
 class DataStructureException : public std::runtime_error
 {
 public:
@@ -11,7 +10,6 @@ public:
         : std::runtime_error(message) {}
 };
 
-// Исключение: выход за границы последовательности
 class IndexOutOfRange : public DataStructureException
 {
 public:
@@ -38,7 +36,6 @@ private:
     std::size_t m_size;
 };
 
-// Исключение: пустая структура (вызов GetFirst/GetLast у пустой последовательности)
 class EmptyStructureException : public DataStructureException
 {
 public:
@@ -46,7 +43,6 @@ public:
         : DataStructureException("Ошибка в " + context + ": последовательность пуста") {}
 };
 
-// Исключение: недопустимый аргумент (отрицательный размер, нулевой указатель и т.д.)
 class InvalidArgument : public DataStructureException
 {
 public:
