@@ -4,7 +4,6 @@
 #include "test_common.hpp"
 #include <iostream>
 
-// ---------- MutableListSequence ----------
 bool testMutableListSequenceBasic() {
     std::cout << "  Проверка базовых методов MutableListSequence" << std::endl;
     int data[] = {11, 22, 33};
@@ -39,7 +38,6 @@ bool testMutableListSequence() {
     return true;
 }
 
-// ---------- ImmutableListSequence ----------
 bool testImmutableListSequenceBasic() {
     std::cout << "  Проверка базовых методов ImmutableListSequence" << std::endl;
     int data[] = {5, 6, 7};
