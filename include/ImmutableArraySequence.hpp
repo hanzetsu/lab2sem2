@@ -6,20 +6,20 @@ template <typename T>
 class ImmutableArraySequence : public Sequence<T>
 {
 private:
-    DynamicArray<T> *data;
+    DynamicArray<T> data;   // объект
 
 public:
-    ImmutableArraySequence(T *items, std::size_t count) : data(new DynamicArray<T>(items, count)) {}
-    ImmutableArraySequence(std::size_t size) : data(new DynamicArray<T>(size)) {}
-    ImmutableArraySequence(const ImmutableArraySequence &other) : data(new DynamicArray<T>(*other.data)) {}
-    ImmutableArraySequence() : data(new DynamicArray<T>(0)) {}
-    ~ImmutableArraySequence() { delete data; }
+    ImmutableArraySequence(T *items, std::size_t count) : data(items, count) {}
+    ImmutableArraySequence(std::size_t size) : data(size) {}
+    ImmutableArraySequence(const ImmutableArraySequence &other) = default;   // копирование data
+    ImmutableArraySequence() : data(0) {}
+    // деструктор не нужен
 
     T GetFirst() const override
     {
         if (GetLength() == 0)
             throw std::out_of_range("Последовательность пуста");
-        return data->Get(0);
+        return data.Get(0);
     }
 
     T GetLast() const override
@@ -27,17 +27,17 @@ public:
         std::size_t len = GetLength();
         if (len == 0)
             throw std::out_of_range("Последовательность пуста");
-        return data->Get(len - 1);
+        return data.Get(len - 1);
     }
 
     T Get(std::size_t index) const override
     {
-        return data->Get(index);
+        return data.Get(index);
     }
 
     std::size_t GetLength() const override
     {
-        return data->GetSize();
+        return data.GetSize();
     }
 
     Sequence<T> *GetSubsequence(std::size_t startIndex, std::size_t endIndex) const override
@@ -47,7 +47,7 @@ public:
         std::size_t newSize = endIndex - startIndex + 1;
         ImmutableArraySequence<T> *sub = new ImmutableArraySequence<T>(newSize);
         for (std::size_t i = 0; i < newSize; ++i)
-            sub->data->Set(i, data->Get(startIndex + i));
+            sub->data.Set(i, data.Get(startIndex + i));
         return sub;
     }
 
@@ -56,8 +56,8 @@ public:
         std::size_t oldSize = GetLength();
         ImmutableArraySequence<T> *newSeq = new ImmutableArraySequence<T>(oldSize + 1);
         for (std::size_t i = 0; i < oldSize; ++i)
-            newSeq->data->Set(i, data->Get(i));
-        newSeq->data->Set(oldSize, item);
+            newSeq->data.Set(i, data.Get(i));
+        newSeq->data.Set(oldSize, item);
         return newSeq;
     }
 
@@ -65,9 +65,9 @@ public:
     {
         std::size_t oldSize = GetLength();
         ImmutableArraySequence<T> *newSeq = new ImmutableArraySequence<T>(oldSize + 1);
-        newSeq->data->Set(0, item);
+        newSeq->data.Set(0, item);
         for (std::size_t i = 0; i < oldSize; ++i)
-            newSeq->data->Set(i + 1, data->Get(i));
+            newSeq->data.Set(i + 1, data.Get(i));
         return newSeq;
     }
 
@@ -78,10 +78,10 @@ public:
             throw std::out_of_range("Неверный индекс вставки");
         ImmutableArraySequence<T> *newSeq = new ImmutableArraySequence<T>(oldSize + 1);
         for (std::size_t i = 0; i < index; ++i)
-            newSeq->data->Set(i, data->Get(i));
-        newSeq->data->Set(index, item);
+            newSeq->data.Set(i, data.Get(i));
+        newSeq->data.Set(index, item);
         for (std::size_t i = index; i < oldSize; ++i)
-            newSeq->data->Set(i + 1, data->Get(i));
+            newSeq->data.Set(i + 1, data.Get(i));
         return newSeq;
     }
 
@@ -91,9 +91,9 @@ public:
         std::size_t otherLen = seq->GetLength();
         ImmutableArraySequence<T> *result = new ImmutableArraySequence<T>(thisLen + otherLen);
         for (std::size_t i = 0; i < thisLen; ++i)
-            result->data->Set(i, data->Get(i));
+            result->data.Set(i, data.Get(i));
         for (std::size_t i = 0; i < otherLen; ++i)
-            result->data->Set(thisLen + i, seq->Get(i));
+            result->data.Set(thisLen + i, seq->Get(i));
         return result;
     }
 };

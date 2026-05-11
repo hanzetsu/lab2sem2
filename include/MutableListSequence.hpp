@@ -64,15 +64,16 @@ public:
         return this;
     }
 
-    Sequence<T> *Concat(Sequence<T> *seq) const override
-    {
-        const MutableListSequence<T> *other = dynamic_cast<const MutableListSequence<T> *>(seq);
-        if (!other)
-            throw std::invalid_argument("Неверный тип последовательности для конкатенации");
-        MutableListSequence<T> *result = new MutableListSequence<T>(*this);
-        result->list.Concat(const_cast<LinkedList<T>&>(other->list));
-        return result;
-    }
+Sequence<T> *Concat(Sequence<T> *seq) const override
+{
+    const MutableListSequence<T> *other = dynamic_cast<const MutableListSequence<T> *>(seq);
+    if (!other)
+        throw std::invalid_argument("Неверный тип последовательности для конкатенации");
+    MutableListSequence<T> *result = new MutableListSequence<T>(*this);
+    for (auto it = other->list.begin(); it != other->list.end(); ++it)
+        result->list.Append(*it);
+    return result;
+}
 
     template <typename U, typename Func>
     MutableListSequence<U> *map(Func f) const

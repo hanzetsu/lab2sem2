@@ -69,13 +69,14 @@ public:
         return newSeq;
     }
 
-    Sequence<T> *Concat(Sequence<T> *seq) const override
-    {
-        const ImmutableListSequence<T> *other = dynamic_cast<const ImmutableListSequence<T> *>(seq);
-        if (!other)
-            throw std::invalid_argument("Неверный тип последовательности для конкатенации");
-        LinkedList<T> newList = list;                    
-        newList.Concat(const_cast<LinkedList<T>&>(other->list));
-        return new ImmutableListSequence<T>(newList);
-    }
+Sequence<T> *Concat(Sequence<T> *seq) const override
+{
+    const ImmutableListSequence<T> *other = dynamic_cast<const ImmutableListSequence<T> *>(seq);
+    if (!other)
+        throw std::invalid_argument("Неверный тип последовательности для конкатенации");
+    LinkedList<T> newList = list;
+    for (auto it = other->list.begin(); it != other->list.end(); ++it)
+        newList.Append(*it);
+    return new ImmutableListSequence<T>(newList);
+}
 };

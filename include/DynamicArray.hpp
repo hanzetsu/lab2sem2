@@ -15,6 +15,7 @@ public:
     DynamicArray(std::size_t size);
     DynamicArray() : data(nullptr), size(0) {}
     DynamicArray(const DynamicArray<T> &other);
+    DynamicArray<T>& operator=(const DynamicArray<T>& other);
     ~DynamicArray()
     {
         delete[] data;
@@ -86,4 +87,17 @@ void DynamicArray<T>::Resize(std::size_t newSize)
     delete[] data;
     data = newData;
     size = newSize;
+}
+template <typename T>
+DynamicArray<T>& DynamicArray<T>::operator=(const DynamicArray<T>& other)
+{
+    if (this != &other)
+    {
+        delete[] data;
+        size = other.size;
+        data = new T[size];
+        for (std::size_t i = 0; i < size; ++i)
+            data[i] = other.data[i];
+    }
+    return *this;
 }
