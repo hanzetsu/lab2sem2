@@ -1,10 +1,14 @@
 #pragma once
 #include "DynamicArray.hpp"
 #include "Sequence.hpp"
-#include "Bit.hpp"
 #include "exceptions.hpp"
 #include <cstdint>
 #include <cstddef>
+
+enum class Bit {
+    zero,
+    one
+};
 
 class BitSequence : public Sequence<Bit>
 {

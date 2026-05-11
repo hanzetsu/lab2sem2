@@ -15,7 +15,6 @@ if(NOT Qt6_FOUND)
 endif()
 
 set(HEADERS_COMMON
-    include/Bit.hpp
     include/BitSequence.hpp
     include/DynamicArray.hpp
     include/ImmutableArraySequence.hpp
