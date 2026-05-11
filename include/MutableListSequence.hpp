@@ -6,66 +6,61 @@ template <typename T>
 class MutableListSequence : public Sequence<T>
 {
 private:
-    LinkedList<T> *list;
+    LinkedList<T> list;
 
 public:
-    MutableListSequence(T *items, std::size_t count) : list(new LinkedList<T>(items, count)) {}
-    MutableListSequence() : list(new LinkedList<T>()) {}
-    MutableListSequence(const MutableListSequence &other) : list(new LinkedList<T>(*other.list)) {}
-
-    ~MutableListSequence()
-    {
-        delete list;
-    }
+    MutableListSequence(T *items, std::size_t count) : list(items, count) {}
+    MutableListSequence() : list() {}
+    MutableListSequence(const MutableListSequence &other) = default;
+    explicit MutableListSequence(const LinkedList<T> &lst) : list(lst) {}
 
     T GetFirst() const override
     {
         if (GetLength() == 0)
             throw std::out_of_range("Последовательность пуста");
-        return list->GetFirst();
+        return list.GetFirst();   // ← .
     }
 
     T GetLast() const override
     {
         if (GetLength() == 0)
             throw std::out_of_range("Последовательность пуста");
-        return list->GetLast();
+        return list.GetLast();
     }
 
     T Get(std::size_t index) const override
     {
-        return list->Get(index);
+        return list.Get(index);
     }
 
     std::size_t GetLength() const override
     {
-        return list->GetLength();
+        return list.GetLength();
     }
 
     Sequence<T> *GetSubsequence(std::size_t startIndex, std::size_t endIndex) const override
     {
-        LinkedList<T> *subList = list->GetSubList(startIndex, endIndex);
-        MutableListSequence<T> *result = new MutableListSequence<T>();
-        delete result->list;
-        result->list = subList;
+        LinkedList<T> *subListPtr = list.GetSubList(startIndex, endIndex);
+        MutableListSequence<T> *result = new MutableListSequence<T>(*subListPtr);
+        delete subListPtr;
         return result;
     }
 
     Sequence<T> *Append(T item) override
     {
-        list->Append(item);
+        list.Append(item);
         return this;
     }
 
     Sequence<T> *Prepend(T item) override
     {
-        list->Prepend(item);
+        list.Prepend(item);
         return this;
     }
 
     Sequence<T> *InsertAt(T item, std::size_t index) override
     {
-        list->InsertAt(item, index);
+        list.InsertAt(item, index);
         return this;
     }
 
@@ -75,7 +70,7 @@ public:
         if (!other)
             throw std::invalid_argument("Неверный тип последовательности для конкатенации");
         MutableListSequence<T> *result = new MutableListSequence<T>(*this);
-        result->list->Concat(*other->list);
+        result->list.Concat(const_cast<LinkedList<T>&>(other->list));
         return result;
     }
 

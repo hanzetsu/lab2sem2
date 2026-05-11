@@ -12,20 +12,40 @@ private:
     T data;
     Node<T> *prev;
     Node<T> *next;
-    Node(const T &val) : data(val), prev(nullptr), next(nullptr) {};
+    Node(const T &val) : data(val), prev(nullptr), next(nullptr) {}
 };
 
 template <typename T>
 class LinkedList
 {
 private:
-    std::size_t size;
     Node<T> *head;
     Node<T> *tail;
 
 public:
+
+    class Iterator
+    {
+    private:
+        Node<T> *ptr;
+    public:
+        Iterator(Node<T> *p = nullptr) : ptr(p) {}
+
+        T& operator*() { return ptr->data; }
+        const T& operator*() const { return ptr->data; }
+
+        T* operator->() { return &(ptr->data); }
+        const T* operator->() const { return &(ptr->data); }
+
+        Iterator& operator++() { ptr = ptr->next; return *this; }
+        Iterator operator++(int) { Iterator tmp = *this; ptr = ptr->next; return tmp; }
+
+        bool operator==(const Iterator& other) const { return ptr == other.ptr; }
+        bool operator!=(const Iterator& other) const { return ptr != other.ptr; }
+    };
+
+    LinkedList() : head(nullptr), tail(nullptr) {}
     LinkedList(T *items, std::size_t count);
-    LinkedList() : head(nullptr), tail(nullptr), size(0) {};
     LinkedList(const LinkedList<T> &list);
     ~LinkedList()
     {
@@ -36,41 +56,46 @@ public:
             delete head;
             head = temp;
         }
-    };
-    T GetFirst()
+    }
+
+    T GetFirst() const
     {
-        if (size == 0)
+        if (head == nullptr)
             throw std::out_of_range("Нет элементов");
         return head->data;
-    };
-    T GetLast()
+    }
+    T GetLast() const
     {
-        if (size == 0)
+        if (tail == nullptr)
             throw std::out_of_range("Нет элементов");
         return tail->data;
-    };
-    T Get(std::size_t index);
-    LinkedList<T> *GetSubList(std::size_t startIndex, std::size_t endIndex);
-    std::size_t GetLength() { return size; }
+    }
+    T Get(std::size_t index) const;
+
+    LinkedList<T> *GetSubList(std::size_t startIndex, std::size_t endIndex) const;
+
+    std::size_t GetLength() const
+    {
+        std::size_t len = 0;
+        for (Iterator it = begin(); it != end(); ++it)
+            ++len;
+        return len;
+    }
+
     void Append(T item);
     void Prepend(T item);
     void InsertAt(T item, std::size_t index);
     void Concat(LinkedList<T> &list);
+
+    Iterator begin() { return Iterator(head); }
+    Iterator end()   { return Iterator(nullptr); }
+    Iterator begin() const { return Iterator(head); }
+    Iterator end()   const { return Iterator(nullptr); }
 };
 
-template <typename T>
-T LinkedList<T>::Get(std::size_t index)
-{
-    if (index >= size)
-        throw std::out_of_range("Индекс вне диапазона");
-    Node<T> *temp = head;
-    for (std::size_t i = 0; i < index; i++)
-        temp = temp->next;
-    return temp->data;
-}
 
 template <typename T>
-LinkedList<T>::LinkedList(T *items, std::size_t count) : head(nullptr), tail(nullptr), size(0)
+LinkedList<T>::LinkedList(T *items, std::size_t count) : head(nullptr), tail(nullptr)
 {
     for (std::size_t i = 0; i < count; ++i)
     {
@@ -83,43 +108,51 @@ LinkedList<T>::LinkedList(T *items, std::size_t count) : head(nullptr), tail(nul
             newNode->prev = tail;
             tail = newNode;
         }
-        size++;
     }
 }
 
 template <typename T>
 LinkedList<T>::LinkedList(const LinkedList<T> &list) : LinkedList()
 {
-    Node<T> *tmp = list.head;
-    while (tmp != nullptr)
-    {
-        Append(tmp->data);
-        tmp = tmp->next;
-    }
+    for (Iterator it = list.begin(); it != list.end(); ++it)
+        Append(*it);
 }
 
 template <typename T>
-LinkedList<T> *LinkedList<T>::GetSubList(std::size_t startIndex, std::size_t endIndex)
+T LinkedList<T>::Get(std::size_t index) const
 {
-    if (startIndex > endIndex || endIndex >= size)
+    if (index >= GetLength())
+        throw std::out_of_range("Индекс вне диапазона");
+    Node<T> *temp = head;
+    for (std::size_t i = 0; i < index; ++i)
+        temp = temp->next;
+    return temp->data;
+}
+
+template <typename T>
+LinkedList<T> *LinkedList<T>::GetSubList(std::size_t startIndex, std::size_t endIndex) const
+{
+    std::size_t len = GetLength();
+    if (startIndex > endIndex || endIndex >= len)
         throw std::out_of_range("Неверные индексы подсписка");
-    LinkedList<T> *newList = new LinkedList<T>();
-    Node<T> *tmp = head;
-    for (std::size_t i = 0; i < startIndex; i++)
-        tmp = tmp->next;
-    for (std::size_t i = startIndex; i <= endIndex; i++)
+
+    LinkedList<T> *result = new LinkedList<T>();
+    Iterator it = begin();
+    for (std::size_t i = 0; i < startIndex; ++i)
+        ++it;
+    for (std::size_t i = startIndex; i <= endIndex; ++i)
     {
-        newList->Append(tmp->data);
-        tmp = tmp->next;
+        result->Append(*it);
+        ++it;
     }
-    return newList;
+    return result;
 }
 
 template <typename T>
 void LinkedList<T>::Append(T item)
 {
     Node<T> *newTail = new Node<T>(item);
-    if (size == 0)
+    if (head == nullptr)
         head = tail = newTail;
     else
     {
@@ -127,14 +160,13 @@ void LinkedList<T>::Append(T item)
         newTail->prev = tail;
         tail = newTail;
     }
-    size++;
 }
 
 template <typename T>
 void LinkedList<T>::Prepend(T item)
 {
     Node<T> *newHead = new Node<T>(item);
-    if (size == 0)
+    if (head == nullptr)
         head = tail = newHead;
     else
     {
@@ -142,41 +174,40 @@ void LinkedList<T>::Prepend(T item)
         newHead->next = head;
         head = newHead;
     }
-    size++;
 }
 
 template <typename T>
 void LinkedList<T>::InsertAt(T item, std::size_t index)
 {
-    if (index > size)
+    std::size_t len = GetLength();
+    if (index > len)
         throw std::out_of_range("Неверный индекс вставки");
     if (index == 0)
     {
         Prepend(item);
         return;
     }
-    if (index == size)
+    if (index == len)
     {
         Append(item);
         return;
     }
     Node<T> *current = head;
-    for (std::size_t i = 0; i < index; i++)
+    for (std::size_t i = 0; i < index; ++i)
         current = current->next;
     Node<T> *newNode = new Node<T>(item);
     newNode->next = current;
     newNode->prev = current->prev;
     current->prev->next = newNode;
     current->prev = newNode;
-    size++;
 }
 
 template <typename T>
 void LinkedList<T>::Concat(LinkedList<T> &list)
 {
-    if (list.size == 0)
+    if (list.head == nullptr)
         return;
-    if (size == 0)
+    if (head == nullptr)
     {
         head = list.head;
         tail = list.tail;
@@ -187,7 +218,5 @@ void LinkedList<T>::Concat(LinkedList<T> &list)
         list.head->prev = tail;
         tail = list.tail;
     }
-    size += list.size;
     list.head = list.tail = nullptr;
-    list.size = 0;
 }
