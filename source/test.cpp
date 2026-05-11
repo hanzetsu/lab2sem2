@@ -8,7 +8,6 @@
 #include "MutableListSequence.hpp"
 #include "ImmutableListSequence.hpp"
 #include "BitSequence.hpp"
-#include "Bit.hpp"
 #include "exceptions.hpp"
 
 using namespace std;

@@ -10,7 +10,7 @@
 #include "ImmutableArraySequence.hpp"
 #include "ImmutableListSequence.hpp"
 #include "BitSequence.hpp"
-#include "Bit.hpp"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
