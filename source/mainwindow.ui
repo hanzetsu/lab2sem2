@@ -25,13 +25,6 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QPushButton" name="getButton">
-       <property name="text">
-        <string>Get</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="appendButton">
        <property name="text">
         <string>Append</string>
@@ -75,14 +68,28 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>370</y>
+      <y>340</y>
       <width>160</width>
       <height>112</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
+      <widget class="QLabel" name="labelValue">
+       <property name="text">
+        <string>Значение:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLineEdit" name="valueLineEdit"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelIndex">
+       <property name="text">
+        <string>Индекс:</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QSpinBox" name="indexSpinBox"/>

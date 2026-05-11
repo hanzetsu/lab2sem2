@@ -3,6 +3,10 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QString>
+#include <QMenu>
+#include <QAction>
+#include <QInputDialog>
+#include <QListWidgetItem>
 
 #include "Sequence.hpp"
 #include "MutableArraySequence.hpp"
@@ -10,7 +14,6 @@
 #include "ImmutableArraySequence.hpp"
 #include "ImmutableListSequence.hpp"
 #include "BitSequence.hpp"
-
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -25,13 +28,14 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_typeComboBox_currentIndexChanged(int index);      // тип последовательности (массив/список/биты)
-    void on_dataTypeComboBox_currentIndexChanged(int index); // тип данных (int/double/QString)
+    void on_typeComboBox_currentIndexChanged(int index);
+    void on_dataTypeComboBox_currentIndexChanged(int index);
     void on_appendButton_clicked();
     void on_prependButton_clicked();
     void on_insertAtButton_clicked();
-    void on_getButton_clicked();
     void on_clearButton_clicked();
+    void on_listWidget_customContextMenuRequested(const QPoint &pos);
+    void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
     void updateDisplay();
 
 private:
@@ -39,14 +43,29 @@ private:
 
     Sequence<int>* currentIntSequence;
     Sequence<double>* currentDoubleSequence;
-    Sequence<QString>* currentStringSequence;
     BitSequence* currentBitSequence;
 
-    int currentSeqType;     // 0=MutableArray,1=MutableList,2=ImmutableArray,3=ImmutableList,4=Bit
-    int currentDataType;    // 0=int,1=double,2=QString
-    bool isBitMode;         
+    int currentSeqType;
+    int currentDataType;
+    bool isBitMode;
 
     void deleteCurrentSequences();
-    void createNewSequence(); 
+    void createNewSequence();
+    void updateInsertAtButtonState();
+    void removeSelected();
+    void editSelected();
+
+    // Шаблонные вспомогательные функции
+    template<typename T>
+    void appendToSequence(Sequence<T>*& seq, T value);
+    template<typename T>
+    void prependToSequence(Sequence<T>*& seq, T value);
+    template<typename T>
+    void insertToSequence(Sequence<T>*& seq, T value, std::size_t index);
+    template<typename T>
+    void removeFromSequence(Sequence<T>*& seq, std::size_t index);
+    template<typename T>
+    void editInSequence(Sequence<T>*& seq, std::size_t index, T newValue);
 };
 
+#include "mainwindow_impl.hpp"
