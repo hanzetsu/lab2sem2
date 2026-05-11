@@ -10,7 +10,6 @@ set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 COMPONENTS Core Widgets)
 
-
 set(HEADERS_COMMON
     include/BitSequence.hpp
     include/DynamicArray.hpp
@@ -42,18 +41,21 @@ qt_add_executable(LAB2SEM2
     ${HEADERS_GUI}
     ${UI_FILES}
 )
-
 target_include_directories(LAB2SEM2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-
 target_link_libraries(LAB2SEM2 PRIVATE Qt6::Core Qt6::Widgets)
 
 
-qt_add_executable(tests
-    source/test.cpp
-    ${HEADERS_COMMON}          
-)
+file(GLOB TEST_SOURCES "tests/*.cpp")
+file(GLOB TEST_HEADERS "tests/*.hpp")
 
-target_include_directories(tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+qt_add_executable(tests
+    ${TEST_SOURCES}
+    ${TEST_HEADERS}
+    ${HEADERS_COMMON}
+)
+target_include_directories(tests PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests
+)
 
 target_link_libraries(tests PRIVATE Qt6::Core)
