@@ -1,6 +1,7 @@
 #pragma once
 #include "LinkedList.hpp"
 #include "Sequence.hpp"
+#include "exceptions.hpp"
 
 template <typename T>
 class ImmutableListSequence : public Sequence<T>
@@ -14,19 +15,17 @@ public:
     ImmutableListSequence(const ImmutableListSequence &other) = default;
     explicit ImmutableListSequence(const LinkedList<T> &lst) : list(lst) {}
 
-    ~ImmutableListSequence() = default;
-
     T GetFirst() const override
     {
         if (GetLength() == 0)
-            throw std::out_of_range("Последовательность пуста");
+            throw EmptyStructureException("ImmutableListSequence::GetFirst");
         return list.GetFirst();
     }
 
     T GetLast() const override
     {
         if (GetLength() == 0)
-            throw std::out_of_range("Последовательность пуста");
+            throw EmptyStructureException("ImmutableListSequence::GetLast");
         return list.GetLast();
     }
 
@@ -69,14 +68,14 @@ public:
         return newSeq;
     }
 
-Sequence<T> *Concat(Sequence<T> *seq) const override
-{
-    const ImmutableListSequence<T> *other = dynamic_cast<const ImmutableListSequence<T> *>(seq);
-    if (!other)
-        throw std::invalid_argument("Неверный тип последовательности для конкатенации");
-    LinkedList<T> newList = list;
-    for (auto it = other->list.begin(); it != other->list.end(); ++it)
-        newList.Append(*it);
-    return new ImmutableListSequence<T>(newList);
-}
+    Sequence<T> *Concat(Sequence<T> *seq) const override
+    {
+        const ImmutableListSequence<T> *other = dynamic_cast<const ImmutableListSequence<T> *>(seq);
+        if (!other)
+            throw InvalidArgument("ImmutableListSequence::Concat: неверный тип последовательности");
+        LinkedList<T> newList = list;
+        for (auto it = other->list.begin(); it != other->list.end(); ++it)
+            newList.Append(*it);
+        return new ImmutableListSequence<T>(newList);
+    }
 };

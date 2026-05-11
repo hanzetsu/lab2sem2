@@ -1,24 +1,24 @@
 #pragma once
 #include "DynamicArray.hpp"
 #include "Sequence.hpp"
+#include "exceptions.hpp"
 
 template <typename T>
 class ImmutableArraySequence : public Sequence<T>
 {
 private:
-    DynamicArray<T> data;   // объект
+    DynamicArray<T> data;
 
 public:
     ImmutableArraySequence(T *items, std::size_t count) : data(items, count) {}
     ImmutableArraySequence(std::size_t size) : data(size) {}
-    ImmutableArraySequence(const ImmutableArraySequence &other) = default;   // копирование data
+    ImmutableArraySequence(const ImmutableArraySequence &other) = default;
     ImmutableArraySequence() : data(0) {}
-    // деструктор не нужен
 
     T GetFirst() const override
     {
         if (GetLength() == 0)
-            throw std::out_of_range("Последовательность пуста");
+            throw EmptyStructureException("ImmutableArraySequence::GetFirst");
         return data.Get(0);
     }
 
@@ -26,7 +26,7 @@ public:
     {
         std::size_t len = GetLength();
         if (len == 0)
-            throw std::out_of_range("Последовательность пуста");
+            throw EmptyStructureException("ImmutableArraySequence::GetLast");
         return data.Get(len - 1);
     }
 
@@ -42,8 +42,9 @@ public:
 
     Sequence<T> *GetSubsequence(std::size_t startIndex, std::size_t endIndex) const override
     {
-        if (startIndex > endIndex || endIndex >= GetLength())
-            throw std::out_of_range("Неверные индексы подпоследовательности");
+        std::size_t len = GetLength();
+        if (startIndex > endIndex || endIndex >= len)
+            throw IndexOutOfRange(endIndex, len, "ImmutableArraySequence::GetSubsequence");
         std::size_t newSize = endIndex - startIndex + 1;
         ImmutableArraySequence<T> *sub = new ImmutableArraySequence<T>(newSize);
         for (std::size_t i = 0; i < newSize; ++i)
@@ -75,7 +76,7 @@ public:
     {
         std::size_t oldSize = GetLength();
         if (index > oldSize)
-            throw std::out_of_range("Неверный индекс вставки");
+            throw IndexOutOfRange(index, oldSize + 1, "ImmutableArraySequence::InsertAt");
         ImmutableArraySequence<T> *newSeq = new ImmutableArraySequence<T>(oldSize + 1);
         for (std::size_t i = 0; i < index; ++i)
             newSeq->data.Set(i, data.Get(i));

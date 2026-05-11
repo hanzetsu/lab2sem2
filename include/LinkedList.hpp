@@ -1,5 +1,5 @@
 #pragma once
-#include <stdexcept>
+#include "exceptions.hpp"
 #include <cstddef>
 
 template <typename T>
@@ -23,7 +23,6 @@ private:
     Node<T> *tail;
 
 public:
-
     class Iterator
     {
     private:
@@ -61,38 +60,38 @@ public:
     T GetFirst() const
     {
         if (head == nullptr)
-            throw std::out_of_range("Нет элементов");
+            throw EmptyStructureException("LinkedList::GetFirst");
         return head->data;
     }
+
     T GetLast() const
     {
         if (tail == nullptr)
-            throw std::out_of_range("Нет элементов");
+            throw EmptyStructureException("LinkedList::GetLast");
         return tail->data;
     }
+
     T Get(std::size_t index) const;
-
     LinkedList<T> *GetSubList(std::size_t startIndex, std::size_t endIndex) const;
-
-    std::size_t GetLength() const
-    {
-        std::size_t len = 0;
-        for (Iterator it = begin(); it != end(); ++it)
-            ++len;
-        return len;
-    }
+    std::size_t GetLength() const;
 
     void Append(T item);
     void Prepend(T item);
     void InsertAt(T item, std::size_t index);
     void Concat(LinkedList<T> &list);
 
-    Iterator begin() { return Iterator(head); }
-    Iterator end()   { return Iterator(nullptr); }
     Iterator begin() const { return Iterator(head); }
-    Iterator end()   const { return Iterator(nullptr); }
+    Iterator end() const { return Iterator(nullptr); }
 };
 
+template <typename T>
+std::size_t LinkedList<T>::GetLength() const
+{
+    std::size_t len = 0;
+    for (Iterator it = begin(); it != end(); ++it)
+        ++len;
+    return len;
+}
 
 template <typename T>
 LinkedList<T>::LinkedList(T *items, std::size_t count) : head(nullptr), tail(nullptr)
@@ -121,8 +120,9 @@ LinkedList<T>::LinkedList(const LinkedList<T> &list) : LinkedList()
 template <typename T>
 T LinkedList<T>::Get(std::size_t index) const
 {
-    if (index >= GetLength())
-        throw std::out_of_range("Индекс вне диапазона");
+    std::size_t len = GetLength();
+    if (index >= len)
+        throw IndexOutOfRange(index, len, "LinkedList::Get");
     Node<T> *temp = head;
     for (std::size_t i = 0; i < index; ++i)
         temp = temp->next;
@@ -134,8 +134,7 @@ LinkedList<T> *LinkedList<T>::GetSubList(std::size_t startIndex, std::size_t end
 {
     std::size_t len = GetLength();
     if (startIndex > endIndex || endIndex >= len)
-        throw std::out_of_range("Неверные индексы подсписка");
-
+        throw IndexOutOfRange(endIndex, len, "LinkedList::GetSubList");
     LinkedList<T> *result = new LinkedList<T>();
     Iterator it = begin();
     for (std::size_t i = 0; i < startIndex; ++i)
@@ -181,7 +180,7 @@ void LinkedList<T>::InsertAt(T item, std::size_t index)
 {
     std::size_t len = GetLength();
     if (index > len)
-        throw std::out_of_range("Неверный индекс вставки");
+        throw IndexOutOfRange(index, len + 1, "LinkedList::InsertAt");
     if (index == 0)
     {
         Prepend(item);

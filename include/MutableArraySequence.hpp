@@ -1,6 +1,7 @@
 #pragma once
 #include "DynamicArray.hpp"
 #include "Sequence.hpp"
+#include "exceptions.hpp"
 
 template <typename T>
 class MutableArraySequence : public Sequence<T>
@@ -17,7 +18,7 @@ public:
     T GetFirst() const override
     {
         if (GetLength() == 0)
-            throw std::out_of_range("Последовательность пуста");
+            throw EmptyStructureException("MutableArraySequence::GetFirst");
         return data.Get(0);
     }
 
@@ -25,7 +26,7 @@ public:
     {
         std::size_t len = GetLength();
         if (len == 0)
-            throw std::out_of_range("Последовательность пуста");
+            throw EmptyStructureException("MutableArraySequence::GetLast");
         return data.Get(len - 1);
     }
 
@@ -44,8 +45,9 @@ public:
 
     Sequence<T> *GetSubsequence(std::size_t startIndex, std::size_t endIndex) const override
     {
-        if (startIndex > endIndex || endIndex >= GetLength())
-            throw std::out_of_range("Неверные индексы подпоследовательности");
+        std::size_t len = GetLength();
+        if (startIndex > endIndex || endIndex >= len)
+            throw IndexOutOfRange(endIndex, len, "MutableArraySequence::GetSubsequence");
         std::size_t newSize = endIndex - startIndex + 1;
         MutableArraySequence<T> *sub = new MutableArraySequence<T>(newSize);
         for (std::size_t i = 0; i < newSize; ++i)
@@ -76,7 +78,7 @@ public:
     {
         std::size_t len = GetLength();
         if (index > len)
-            throw std::out_of_range("Неверный индекс вставки");
+            throw IndexOutOfRange(index, len + 1, "MutableArraySequence::InsertAt");
         DynamicArray<T> newData(len + 1);
         for (std::size_t i = 0; i < index; ++i)
             newData.Set(i, data.Get(i));
@@ -105,9 +107,7 @@ public:
         std::size_t len = this->GetLength();
         MutableArraySequence<U> *result = new MutableArraySequence<U>(len);
         for (std::size_t i = 0; i < len; ++i)
-        {
             result->Set(i, f(this->Get(i)));
-        }
         return result;
     }
 
@@ -116,9 +116,7 @@ public:
     {
         U acc = init;
         for (std::size_t i = 0; i < this->GetLength(); ++i)
-        {
             acc = f(acc, this->Get(i));
-        }
         return acc;
     }
 };

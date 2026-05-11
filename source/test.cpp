@@ -9,7 +9,7 @@
 #include "ImmutableListSequence.hpp"
 #include "BitSequence.hpp"
 #include "Bit.hpp"
-
+#include "exceptions.hpp"
 
 using namespace std;
 
@@ -17,7 +17,7 @@ template <typename T>
 void printSequence(Sequence<T>* seq, const string& title)
 {
     cout << title << " [";
-    for (int i = 0; i < seq->GetLength(); ++i)
+    for (size_t i = 0; i < seq->GetLength(); ++i)
     {
         if (i > 0) cout << ", ";
         cout << seq->Get(i);
@@ -28,7 +28,7 @@ void printSequence(Sequence<T>* seq, const string& title)
 void printBitSequence(Sequence<Bit>* seq, const string& title)
 {
     cout << title << " [";
-    for (int i = 0; i < seq->GetLength(); ++i)
+    for (size_t i = 0; i < seq->GetLength(); ++i)
     {
         if (i > 0) cout << ", ";
         cout << (seq->Get(i) == Bit::one ? "1" : "0");
@@ -36,8 +36,6 @@ void printBitSequence(Sequence<Bit>* seq, const string& title)
     cout << "]" << endl;
 }
 
-
-// Тесты для DynamicArray
 void testDynamicArrayConstructionFromArray()
 {
     cout << "  Проверка конструктора от массива и методов Get/GetSize" << endl;
@@ -98,13 +96,13 @@ void testDynamicArrayExceptionOutOfRange()
     try {
         arr.Get(5);
         assert(false && "Исключение не выброшено");
-    } catch (const out_of_range& e) {
+    } catch (const IndexOutOfRange& e) {
         cout << "    Исключение перехвачено: " << e.what() << endl;
     }
     try {
         arr.Set(5, 0);
         assert(false);
-    } catch (const out_of_range& e) {
+    } catch (const IndexOutOfRange& e) {
         cout << "    Исключение перехвачено: " << e.what() << endl;
     }
     cout << "    OK" << endl;
@@ -120,7 +118,6 @@ void testDynamicArray()
     testDynamicArrayExceptionOutOfRange();
 }
 
-// Тесты для LinkedList
 void testLinkedListConstructionAndGetters()
 {
     cout << "  Проверка конструктора от массива, GetFirst, GetLast, GetLength" << endl;
@@ -152,12 +149,12 @@ void testLinkedListInsertAt()
     cout << "  Проверка InsertAt" << endl;
     int items[] = {1, 2, 4, 5};
     LinkedList<int> list(items, 4);
-    list.InsertAt(3, 2);   // вставка в середину
+    list.InsertAt(3, 2);
     assert(list.GetLength() == 5);
     assert(list.Get(2) == 3);
-    list.InsertAt(0, 0);   // вставка в начало
+    list.InsertAt(0, 0);
     assert(list.Get(0) == 0);
-    list.InsertAt(6, list.GetLength()); // вставка в конец
+    list.InsertAt(6, list.GetLength());
     assert(list.Get(list.GetLength() - 1) == 6);
     cout << "    OK" << endl;
 }
@@ -168,7 +165,7 @@ void testLinkedListGetSubList()
     int items[] = {0, 1, 2, 3, 4, 5};
     LinkedList<int> list(items, 6);
     LinkedList<int>* sub = list.GetSubList(1, 4);
-    assert(sub->GetLength() == 4); // индексы 1,2,3,4
+    assert(sub->GetLength() == 4);
     assert(sub->Get(0) == 1);
     assert(sub->Get(3) == 4);
     delete sub;
@@ -186,7 +183,7 @@ void testLinkedListConcat()
     assert(listA.GetLength() == 4);
     assert(listA.Get(2) == 3);
     assert(listA.Get(3) == 4);
-    assert(listB.GetLength() == 0); // listB должен стать пустым
+    assert(listB.GetLength() == 0);
     cout << "    OK" << endl;
 }
 
@@ -197,7 +194,7 @@ void testLinkedListExceptionEmpty()
     try {
         empty.GetFirst();
         assert(false);
-    } catch (const out_of_range& e) {
+    } catch (const EmptyStructureException& e) {
         cout << "    Исключение перехвачено: " << e.what() << endl;
     }
     cout << "    OK" << endl;
@@ -214,7 +211,6 @@ void testLinkedList()
     testLinkedListExceptionEmpty();
 }
 
-// Тесты для MutableArraySequence
 void testMutableArraySequenceBasic()
 {
     cout << "  Проверка базовых методов (GetFirst, GetLast, Get, GetLength)" << endl;
@@ -250,7 +246,7 @@ void testMutableArraySequenceGetSubsequence()
     int data[] = {0, 1, 2, 3, 4, 5};
     MutableArraySequence<int> seq(data, 6);
     Sequence<int>* sub = seq.GetSubsequence(2, 4);
-    assert(sub->GetLength() == 3); // индексы 2,3,4
+    assert(sub->GetLength() == 3);
     assert(sub->Get(0) == 2);
     assert(sub->Get(2) == 4);
     delete sub;
@@ -268,7 +264,7 @@ void testMutableArraySequenceConcat()
     assert(concat->GetLength() == 4);
     assert(concat->Get(0) == 1);
     assert(concat->Get(2) == 3);
-    assert(seqA.GetLength() == 2); // исходные не изменились
+    assert(seqA.GetLength() == 2);
     delete concat;
     cout << "    OK" << endl;
 }
@@ -282,7 +278,6 @@ void testMutableArraySequence()
     testMutableArraySequenceConcat();
 }
 
-// Тесты для ImmutableArraySequence
 void testImmutableArraySequenceBasic()
 {
     cout << "  Проверка базовых методов (GetFirst, GetLast, Get, GetLength)" << endl;
@@ -301,7 +296,7 @@ void testImmutableArraySequenceAppend()
     int data[] = {1, 2};
     ImmutableArraySequence<int> orig(data, 2);
     Sequence<int>* newSeq = orig.Append(3);
-    assert(orig.GetLength() == 2);   // не изменилась
+    assert(orig.GetLength() == 2);
     assert(newSeq->GetLength() == 3);
     assert(newSeq->Get(2) == 3);
     delete newSeq;
@@ -342,7 +337,6 @@ void testImmutableArraySequence()
     testImmutableArraySequencePrepend();
     testImmutableArraySequenceInsertAt();
 }
-// Тесты для MutableListSequence
 
 void testMutableListSequenceBasic()
 {
@@ -378,8 +372,6 @@ void testMutableListSequence()
     testMutableListSequenceAppendPrependInsert();
 }
 
-// Тесты для ImmutableListSequence
-
 void testImmutableListSequenceBasic()
 {
     cout << "  Проверка базовых методов" << endl;
@@ -411,8 +403,6 @@ void testImmutableListSequence()
     testImmutableListSequenceAppend();
 }
 
-// Тесты для BitSequence
-
 void testBitSequenceConstruction()
 {
     cout << "  Проверка конструкторов и Get" << endl;
@@ -428,14 +418,12 @@ void testBitSequenceConstruction()
 
 void testBitSequenceAppend()
 {
-    cout << "  Проверка Append (immutable)" << endl;
+    cout << "  Проверка Append (mutable)" << endl;
     Bit bits[] = {Bit::one, Bit::zero};
-    BitSequence orig(bits, 2);
-    Sequence<Bit>* newSeq = orig.Append(Bit::one);
-    assert(orig.GetLength() == 2);
-    assert(newSeq->GetLength() == 3);
-    assert(newSeq->Get(2) == Bit::one);
-    delete newSeq;
+    BitSequence seq(bits, 2);
+    seq.Append(Bit::one);
+    assert(seq.GetLength() == 3);
+    assert(seq.Get(2) == Bit::one);
     cout << "    OK" << endl;
 }
 
@@ -528,7 +516,7 @@ int main()
         testBitSequence();
         cout << "\n=== Все тесты успешно пройдены! ===" << endl;
     }
-    catch (const exception& e)
+    catch (const std::exception& e)
     {
         cerr << "Ошибка: " << e.what() << endl;
         return 1;

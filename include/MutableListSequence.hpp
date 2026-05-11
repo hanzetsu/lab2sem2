@@ -1,6 +1,7 @@
 #pragma once
 #include "LinkedList.hpp"
 #include "Sequence.hpp"
+#include "exceptions.hpp"
 
 template <typename T>
 class MutableListSequence : public Sequence<T>
@@ -17,14 +18,14 @@ public:
     T GetFirst() const override
     {
         if (GetLength() == 0)
-            throw std::out_of_range("Последовательность пуста");
-        return list.GetFirst();   // ← .
+            throw EmptyStructureException("MutableListSequence::GetFirst");
+        return list.GetFirst();
     }
 
     T GetLast() const override
     {
         if (GetLength() == 0)
-            throw std::out_of_range("Последовательность пуста");
+            throw EmptyStructureException("MutableListSequence::GetLast");
         return list.GetLast();
     }
 
@@ -64,16 +65,16 @@ public:
         return this;
     }
 
-Sequence<T> *Concat(Sequence<T> *seq) const override
-{
-    const MutableListSequence<T> *other = dynamic_cast<const MutableListSequence<T> *>(seq);
-    if (!other)
-        throw std::invalid_argument("Неверный тип последовательности для конкатенации");
-    MutableListSequence<T> *result = new MutableListSequence<T>(*this);
-    for (auto it = other->list.begin(); it != other->list.end(); ++it)
-        result->list.Append(*it);
-    return result;
-}
+    Sequence<T> *Concat(Sequence<T> *seq) const override
+    {
+        const MutableListSequence<T> *other = dynamic_cast<const MutableListSequence<T> *>(seq);
+        if (!other)
+            throw InvalidArgument("MutableListSequence::Concat: неверный тип последовательности");
+        MutableListSequence<T> *result = new MutableListSequence<T>(*this);
+        for (auto it = other->list.begin(); it != other->list.end(); ++it)
+            result->list.Append(*it);
+        return result;
+    }
 
     template <typename U, typename Func>
     MutableListSequence<U> *map(Func f) const
@@ -81,9 +82,7 @@ Sequence<T> *Concat(Sequence<T> *seq) const override
         std::size_t len = this->GetLength();
         MutableListSequence<U> *result = new MutableListSequence<U>();
         for (std::size_t i = 0; i < len; ++i)
-        {
             result->Append(f(this->Get(i)));
-        }
         return result;
     }
 
@@ -92,9 +91,7 @@ Sequence<T> *Concat(Sequence<T> *seq) const override
     {
         U acc = init;
         for (std::size_t i = 0; i < this->GetLength(); ++i)
-        {
             acc = f(acc, this->Get(i));
-        }
         return acc;
     }
 };

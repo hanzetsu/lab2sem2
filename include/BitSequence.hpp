@@ -2,8 +2,8 @@
 #include "DynamicArray.hpp"
 #include "Sequence.hpp"
 #include "Bit.hpp"
+#include "exceptions.hpp"
 #include <cstdint>
-#include <stdexcept>
 #include <cstddef>
 
 class BitSequence : public Sequence<Bit>
@@ -50,21 +50,21 @@ public:
     Bit GetFirst() const override
     {
         if (bitLength == 0)
-            throw std::out_of_range("Последовательность битов пуста");
+            throw EmptyStructureException("BitSequence::GetFirst");
         return Get(0);
     }
 
     Bit GetLast() const override
     {
         if (bitLength == 0)
-            throw std::out_of_range("Последовательность битов пуста");
+            throw EmptyStructureException("BitSequence::GetLast");
         return Get(bitLength - 1);
     }
 
     Bit Get(std::size_t index) const override
     {
         if (index >= bitLength)
-            throw std::out_of_range("Индекс вне диапазона");
+            throw IndexOutOfRange(index, bitLength, "BitSequence::Get");
         std::size_t byteIdx = byteIndex(index);
         int bitOff = bitOffset(index);
         uint8_t byte = bytes.Get(byteIdx);
@@ -76,7 +76,7 @@ public:
     Sequence<Bit> *GetSubsequence(std::size_t startIndex, std::size_t endIndex) const override
     {
         if (startIndex > endIndex || endIndex >= bitLength)
-            throw std::out_of_range("Неверные индексы подпоследовательности");
+            throw IndexOutOfRange(endIndex, bitLength, "BitSequence::GetSubsequence");
         std::size_t newSize = endIndex - startIndex + 1;
         BitSequence *sub = new BitSequence(newSize);
         for (std::size_t i = 0; i < newSize; ++i)
@@ -136,7 +136,7 @@ public:
     Sequence<Bit> *InsertAt(Bit item, std::size_t index) override
     {
         if (index > bitLength)
-            throw std::out_of_range("Неверный индекс вставки");
+            throw IndexOutOfRange(index, bitLength + 1, "BitSequence::InsertAt");
         BitSequence *newSeq = new BitSequence(bitLength + 1);
         for (std::size_t i = 0; i < index; ++i)
             if (Get(i) == Bit::one)
@@ -171,7 +171,7 @@ public:
     Sequence<Bit> *Concat(Sequence<Bit> *seq) const override
     {
         if (!seq)
-            throw std::invalid_argument("Пустой указатель на последовательность");
+            throw InvalidArgument("BitSequence::Concat: пустой указатель на последовательность");
         std::size_t otherLen = seq->GetLength();
         BitSequence *result = new BitSequence(bitLength + otherLen);
         for (std::size_t i = 0; i < bitLength; ++i)
