@@ -2,6 +2,7 @@
 
 #include "exceptions.hpp"
 #include <cstddef>
+#include <initializer_list>
 
 template <typename T>
 class DynamicArray
@@ -11,11 +12,22 @@ private:
     std::size_t size;
 
 public:
+    using iterator = T*;
+    using const_iterator = const T*;
+
     DynamicArray(T *items, std::size_t count);
     DynamicArray(std::size_t size);
     DynamicArray() : data(nullptr), size(0) {}
     DynamicArray(const DynamicArray<T> &other);
-    DynamicArray<T>& operator=(const DynamicArray<T>& other);
+    DynamicArray(std::initializer_list<T> list)
+        : size(list.size()), data(new T[size])
+    {
+        std::size_t i = 0;
+        for (const T &value : list) {
+            data[i++] = value;
+        }
+    }
+    DynamicArray<T>& operator=(const DynamicArray<T> &other);
     ~DynamicArray() { delete[] data; }
 
     T Get(std::size_t index) const;
@@ -23,6 +35,11 @@ public:
     T* GetRawData() const { return data; }
     void Set(std::size_t index, T value);
     void Resize(std::size_t newSize);
+
+    iterator begin() { return data; }
+    iterator end()   { return data + size; }
+    const_iterator begin() const { return data; }
+    const_iterator end() const   { return data + size; }
 };
 
 template <typename T>
@@ -80,7 +97,7 @@ void DynamicArray<T>::Resize(std::size_t newSize)
 }
 
 template <typename T>
-DynamicArray<T>& DynamicArray<T>::operator=(const DynamicArray<T>& other)
+DynamicArray<T> &DynamicArray<T>::operator=(const DynamicArray<T> &other)
 {
     if (this != &other)
     {

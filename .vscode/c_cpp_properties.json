@@ -3,18 +3,18 @@
         {
             "name": "Win32",
             "includePath": [
-    "${workspaceFolder}/**",
-    "${workspaceFolder}/build/**",
-    "${workspaceFolder}/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/LAB2SEM2_autogen/include",
-                    "C:/Qt/6.11.0/mingw_64/include",
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/build/**",
+                "${workspaceFolder}/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/LAB2SEM2_autogen/include",
+                "C:/Qt/6.11.0/mingw_64/include",
                 "C:/Qt/6.11.0/mingw_64/include/QtCore",
                 "C:/Qt/6.11.0/mingw_64/include/QtGui",
                 "C:/Qt/6.11.0/mingw_64/include/QtWidgets"
-],
+            ],
             "defines": [],
             "compilerPath": "C:/w64devkit/bin/g++.exe",
             "cStandard": "c17",
-            "cppStandard": "c++17",
+            "cppStandard": "c++23",
             "intelliSenseMode": "windows-gcc-x64"
         }
     ],
