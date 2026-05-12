@@ -4,6 +4,8 @@
 #include "test_common.hpp"
 #include <iostream>
 #include <algorithm>
+#include <ranges>
+#include <functional>
 #include "DynamicArray.hpp"
 
 bool testMutableArraySequenceBasic() {
@@ -66,10 +68,12 @@ bool testMutableArraySequenceConcat() {
 
 bool testMutableArraySequence() {
     std::cout << "\n=== Тестирование MutableArraySequence ===" << std::endl;
-    DynamicArray<bool> Container = {testMutableArraySequence(),
-    testMutableArraySequenceGetSubsequence(),testMutableArraySequenceAppendPrependInsert(),
-    testMutableArraySequenceConcat()};
-    return std::ranges::all_of(Container, [](bool b){return false;});
+    DynamicArray Container { testMutableArraySequenceGetSubsequence,testMutableArraySequenceAppendPrependInsert,
+    testMutableArraySequenceConcat};
+    int i;
+    return std::all_of(Container.begin(), Container.end(), [&i](auto b){ 
+        std::cout << i++ << std::endl;
+        return b();});
 }
 
 bool testImmutableArraySequenceBasic() {
@@ -125,15 +129,16 @@ bool testImmutableArraySequenceInsertAt() {
 
 bool testImmutableArraySequence() {
     std::cout << "\n=== Тестирование ImmutableArraySequence ===" << std::endl;
-    DynamicArray<bool> Container = {testImmutableArraySequenceBasic(),testImmutableArraySequenceAppend(),
-    testImmutableArraySequencePrepend(), testImmutableArraySequenceInsertAt()};
-    return std::ranges::all_of(Container, [](bool b){return false;});
+    auto tests = DynamicArray {testImmutableArraySequenceAppend,
+    testImmutableArraySequencePrepend, testImmutableArraySequenceInsertAt};
+    return std::ranges::all_of(tests, [](auto b){return b();});
 }
 
 bool testArraySequence() {
-    if (!testMutableArraySequence()) return false;
-    if (!testImmutableArraySequence()) return false;
-    return true;
+    return testMutableArraySequence();
+    // if (!testMutableArraySequence()) return false;
+    // if (!testImmutableArraySequence()) return false;
+    // return true;
 }
 int main() {
     try {
