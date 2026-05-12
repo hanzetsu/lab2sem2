@@ -22,18 +22,9 @@ set(HEADERS_COMMON
     include/Exceptions.hpp
 )
 
-set(HEADERS_GUI
-    include/mainwindow.hpp
-)
-
-set(SOURCES_GUI
-    source/main.cpp
-    source/mainwindow.cpp
-)
-
-set(UI_FILES
-    source/mainwindow.ui
-)
+set(HEADERS_GUI include/mainwindow.hpp)
+set(SOURCES_GUI source/main.cpp source/mainwindow.cpp)
+set(UI_FILES source/mainwindow.ui)
 
 qt_add_executable(LAB2SEM2
     ${SOURCES_GUI}
@@ -45,17 +36,24 @@ target_include_directories(LAB2SEM2 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(LAB2SEM2 PRIVATE Qt6::Core Qt6::Widgets)
 
 
-file(GLOB TEST_SOURCES "tests/*.cpp")
-file(GLOB TEST_HEADERS "tests/*.hpp")
-
-qt_add_executable(tests
-    ${TEST_SOURCES}
-    ${TEST_HEADERS}
+set(TEST_COMMON_HEADERS
     ${HEADERS_COMMON}
-)
-target_include_directories(tests PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/tests
+    tests/test_common.hpp
 )
 
-target_link_libraries(tests PRIVATE Qt6::Core)
+function(add_test_executable TARGET_NAME SOURCE_FILE)
+    qt_add_executable(${TARGET_NAME}
+        ${SOURCE_FILE}
+        ${TEST_COMMON_HEADERS}
+    )
+    target_include_directories(${TARGET_NAME} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests
+    )
+    target_link_libraries(${TARGET_NAME} PRIVATE Qt6::Core)
+endfunction()
+
+add_test_executable(test_bit_sequence     tests/test_bit_sequence.cpp)
+add_test_executable(test_array_sequence   tests/test_array_sequence.cpp)
+add_test_executable(test_list_sequence    tests/test_list_sequence.cpp)
+add_test_executable(test_map_reduce       tests/test_map_reduce.cpp)

@@ -26,3 +26,17 @@ bool testMapReduce() {
     std::cout << "    OK" << std::endl;
     return true;
 }
+int main() {
+    try {
+        if (testMapReduce()) {
+            std::cout << "\n=== Тесты MapReduce пройдены ===" << std::endl;
+            return 0;
+        } else {
+            std::cerr << "\n=== Тесты MapReduce не пройдены ===" << std::endl;
+            return 1;
+        }
+    } catch (const IException& e) {
+        std::cerr << "Исключение: " << e.what() << std::endl;
+        return 1;
+    }
+}

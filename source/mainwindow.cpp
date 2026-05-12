@@ -324,6 +324,7 @@ void MainWindow::editSelected()
     bool ok;
     QString newText = QInputDialog::getText(this, "Редактирование", "Новое значение:",
                                             QLineEdit::Normal, oldValueText, &ok);
+        if (newText.isEmpty()) QMessageBox::warning(this, "Ошибка","Пусто");
     if (!ok || newText.isEmpty()) return;
 
     try {

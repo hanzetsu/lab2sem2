@@ -136,3 +136,17 @@ bool testArraySequence() {
     if (!testImmutableArraySequence()) return false;
     return true;
 }
+int main() {
+    try {
+        if (testArraySequence()) {
+            std::cout << "\n=== Тесты ArraySequence пройдены ===" << std::endl;
+            return 0;
+        } else {
+            std::cerr << "\n=== Тесты ArraySequence не пройдены ===" << std::endl;
+            return 1;
+        }
+    } catch (const IException& e) {
+        std::cerr << "Исключение: " << e.what() << std::endl;
+        return 1;
+    }
+}

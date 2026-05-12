@@ -77,3 +77,17 @@ bool testBitSequence() {
     if (!testBitSequenceConcat()) return false;
     return true;
 }
+int main() {
+    try {
+        if (testBitSequence()) {
+            std::cout << "\n=== Тесты BitSequence пройдены ===" << std::endl;
+            return 0;
+        } else {
+            std::cerr << "\n=== Тесты BitSequence не пройдены ===" << std::endl;
+            return 1;
+        }
+    } catch (const IException& e) {
+        std::cerr << "Исключение: " << e.what() << std::endl;
+        return 1;
+    }
+}

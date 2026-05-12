@@ -69,9 +69,23 @@ bool testImmutableListSequence() {
     return true;
 }
 
-// Общая функция
 bool testListSequence() {
     if (!testMutableListSequence()) return false;
     if (!testImmutableListSequence()) return false;
     return true;
+}
+
+int main() {
+    try {
+        if (testListSequence()) {
+            std::cout << "\n=== Тесты ListSequence пройдены ===" << std::endl;
+            return 0;
+        } else {
+            std::cerr << "\n=== Тесты ListSequence не пройдены ===" << std::endl;
+            return 1;
+        }
+    } catch (const IException& e) {
+        std::cerr << "Исключение: " << e.what() << std::endl;
+        return 1;
+    }
 }
