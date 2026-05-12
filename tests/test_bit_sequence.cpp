@@ -3,7 +3,8 @@
 #include "test_common.hpp"
 #include <iostream>
 
-bool testBitSequenceConstruction() {
+bool testBitSequenceConstruction()
+{
     std::cout << "  Проверка конструкторов и Get" << std::endl;
     Bit bits[] = {Bit::one, Bit::zero, Bit::one};
     BitSequence seq(bits, 3);
@@ -16,7 +17,8 @@ bool testBitSequenceConstruction() {
     return true;
 }
 
-bool testBitSequenceAppend() {
+bool testBitSequenceAppend()
+{
     std::cout << "  Проверка Append (mutable)" << std::endl;
     Bit bits[] = {Bit::one, Bit::zero};
     BitSequence seq(bits, 2);
@@ -27,11 +29,12 @@ bool testBitSequenceAppend() {
     return true;
 }
 
-bool testBitSequencePrepend() {
+bool testBitSequencePrepend()
+{
     std::cout << "  Проверка Prepend (immutable)" << std::endl;
     Bit bits[] = {Bit::zero, Bit::one};
     BitSequence orig(bits, 2);
-    Sequence<Bit>* newSeq = orig.Prepend(Bit::one);
+    Sequence<Bit> *newSeq = orig.Prepend(Bit::one);
     TEST_ASSERT(orig.GetLength() == 2, "исходная длина изменилась");
     TEST_ASSERT(newSeq->GetLength() == 3, "новая длина не 3");
     TEST_ASSERT(newSeq->Get(0) == Bit::one, "первый бит не 1");
@@ -40,11 +43,12 @@ bool testBitSequencePrepend() {
     return true;
 }
 
-bool testBitSequenceInsertAt() {
+bool testBitSequenceInsertAt()
+{
     std::cout << "  Проверка InsertAt (immutable)" << std::endl;
     Bit bits[] = {Bit::one, Bit::one, Bit::zero};
     BitSequence orig(bits, 3);
-    Sequence<Bit>* newSeq = orig.InsertAt(Bit::zero, 1);
+    Sequence<Bit> *newSeq = orig.InsertAt(Bit::zero, 1);
     TEST_ASSERT(orig.GetLength() == 3, "исходная длина изменилась");
     TEST_ASSERT(newSeq->GetLength() == 4, "новая длина не 4");
     TEST_ASSERT(newSeq->Get(1) == Bit::zero, "бит на позиции 1 не 0");
@@ -53,13 +57,14 @@ bool testBitSequenceInsertAt() {
     return true;
 }
 
-bool testBitSequenceConcat() {
+bool testBitSequenceConcat()
+{
     std::cout << "  Проверка Concat (immutable)" << std::endl;
     Bit a[] = {Bit::one, Bit::zero};
     Bit b[] = {Bit::one, Bit::one};
     BitSequence seqA(a, 2);
     BitSequence seqB(b, 2);
-    Sequence<Bit>* concat = seqA.Concat(&seqB);
+    Sequence<Bit> *concat = seqA.Concat(&seqB);
     TEST_ASSERT(concat->GetLength() == 4, "длина результата не 4");
     TEST_ASSERT(concat->Get(0) == Bit::one, "0-й бит не 1");
     TEST_ASSERT(concat->Get(2) == Bit::one, "2-й бит не 1");
@@ -68,25 +73,35 @@ bool testBitSequenceConcat() {
     return true;
 }
 
-bool testBitSequence() {
+bool testBitSequence()
+{
     std::cout << "\n=== Тестирование BitSequence ===" << std::endl;
-    if (!testBitSequenceConstruction()) return false;
-    if (!testBitSequenceAppend()) return false;
-    if (!testBitSequencePrepend()) return false;
-    if (!testBitSequenceInsertAt()) return false;
-    if (!testBitSequenceConcat()) return false;
-    return true;
+    auto tests = DynamicArray{
+        testBitSequenceConstruction,
+        testBitSequenceAppend,
+        testBitSequencePrepend,
+        testBitSequenceInsertAt,
+        testBitSequenceConcat};
+    return std::ranges::all_of(tests, [](auto f)
+                               { return f(); });
 }
-int main() {
-    try {
-        if (testBitSequence()) {
+int main()
+{
+    try
+    {
+        if (testBitSequence())
+        {
             std::cout << "\n=== Тесты BitSequence пройдены ===" << std::endl;
             return 0;
-        } else {
+        }
+        else
+        {
             std::cerr << "\n=== Тесты BitSequence не пройдены ===" << std::endl;
             return 1;
         }
-    } catch (const IException& e) {
+    }
+    catch (const IException &e)
+    {
         std::cerr << "Исключение: " << e.what() << std::endl;
         return 1;
     }

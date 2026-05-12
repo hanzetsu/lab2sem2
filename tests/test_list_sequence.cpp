@@ -4,7 +4,8 @@
 #include "test_common.hpp"
 #include <iostream>
 
-bool testMutableListSequenceBasic() {
+bool testMutableListSequenceBasic()
+{
     std::cout << "  Проверка базовых методов MutableListSequence" << std::endl;
     int data[] = {11, 22, 33};
     MutableListSequence<int> seq(data, 3);
@@ -16,7 +17,8 @@ bool testMutableListSequenceBasic() {
     return true;
 }
 
-bool testMutableListSequenceAppendPrependInsert() {
+bool testMutableListSequenceAppendPrependInsert()
+{
     std::cout << "  Проверка Append, Prepend, InsertAt MutableListSequence" << std::endl;
     int data[] = {20, 30};
     MutableListSequence<int> seq(data, 2);
@@ -31,14 +33,18 @@ bool testMutableListSequenceAppendPrependInsert() {
     return true;
 }
 
-bool testMutableListSequence() {
+bool testMutableListSequence()
+{
     std::cout << "\n=== Тестирование MutableListSequence ===" << std::endl;
-    if (!testMutableListSequenceBasic()) return false;
-    if (!testMutableListSequenceAppendPrependInsert()) return false;
-    return true;
+    auto tests = DynamicArray{
+        testMutableListSequenceBasic,
+        testMutableListSequenceAppendPrependInsert};
+    return std::ranges::all_of(tests, [](auto f)
+                               { return f(); });
 }
 
-bool testImmutableListSequenceBasic() {
+bool testImmutableListSequenceBasic()
+{
     std::cout << "  Проверка базовых методов ImmutableListSequence" << std::endl;
     int data[] = {5, 6, 7};
     ImmutableListSequence<int> seq(data, 3);
@@ -49,11 +55,12 @@ bool testImmutableListSequenceBasic() {
     return true;
 }
 
-bool testImmutableListSequenceAppend() {
+bool testImmutableListSequenceAppend()
+{
     std::cout << "  Проверка Append ImmutableListSequence (возвращает новый объект)" << std::endl;
     int data[] = {1, 2};
     ImmutableListSequence<int> orig(data, 2);
-    Sequence<int>* newSeq = orig.Append(3);
+    Sequence<int> *newSeq = orig.Append(3);
     TEST_ASSERT(orig.GetLength() == 2, "исходная изменилась");
     TEST_ASSERT(newSeq->GetLength() == 3, "новая длина не 3");
     TEST_ASSERT(newSeq->Get(2) == 3, "добавленный элемент не 3");
@@ -62,29 +69,42 @@ bool testImmutableListSequenceAppend() {
     return true;
 }
 
-bool testImmutableListSequence() {
+bool testImmutableListSequence()
+{
     std::cout << "\n=== Тестирование ImmutableListSequence ===" << std::endl;
-    if (!testImmutableListSequenceBasic()) return false;
-    if (!testImmutableListSequenceAppend()) return false;
+    auto tests = DynamicArray{
+        testImmutableListSequenceBasic,
+        testImmutableListSequenceAppend};
+    return std::ranges::all_of(tests, [](auto f)
+                               { return f(); });
+}
+
+bool testListSequence()
+{
+    if (!testMutableListSequence())
+        return false;
+    if (!testImmutableListSequence())
+        return false;
     return true;
 }
 
-bool testListSequence() {
-    if (!testMutableListSequence()) return false;
-    if (!testImmutableListSequence()) return false;
-    return true;
-}
-
-int main() {
-    try {
-        if (testListSequence()) {
+int main()
+{
+    try
+    {
+        if (testListSequence())
+        {
             std::cout << "\n=== Тесты ListSequence пройдены ===" << std::endl;
             return 0;
-        } else {
+        }
+        else
+        {
             std::cerr << "\n=== Тесты ListSequence не пройдены ===" << std::endl;
             return 1;
         }
-    } catch (const IException& e) {
+    }
+    catch (const IException &e)
+    {
         std::cerr << "Исключение: " << e.what() << std::endl;
         return 1;
     }
