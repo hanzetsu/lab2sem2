@@ -57,3 +57,10 @@ add_test_executable(test_bit_sequence     tests/test_bit_sequence.cpp)
 add_test_executable(test_array_sequence   tests/test_array_sequence.cpp)
 add_test_executable(test_list_sequence    tests/test_list_sequence.cpp)
 add_test_executable(test_map_reduce       tests/test_map_reduce.cpp)
+
+enable_testing()
+
+add_test(NAME test_bit_sequence COMMAND test_bit_sequence)
+add_test(NAME test_array_sequence COMMAND test_array_sequence)
+add_test(NAME test_list_sequence COMMAND test_list_sequence)
+add_test(NAME test_map_reduce COMMAND test_map_reduce)
