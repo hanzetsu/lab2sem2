@@ -55,7 +55,6 @@ private:
     void removeSelected();
     void editSelected();
 
-    // Шаблонные вспомогательные функции
     template<typename T>
     void appendToSequence(Sequence<T>*& seq, T value);
     template<typename T>

@@ -5,12 +5,11 @@
 #include "BitSequence.hpp"
 
 #define TEST_ASSERT(cond, msg) \
-    do { \
-        if (!(cond)) { \
-            std::cerr << "    Ошибка: " << msg << std::endl; \
-            return false; \
-        } \
-    } while(0)
+    for (bool _ok = true; _ok && !(cond); _ok = false) \
+    { \
+        std::cerr << "    Ошибка: " << msg << std::endl; \
+        return false; \
+    }
 
 template <typename T>
 void printSequence(Sequence<T>* seq, const std::string& title) {
